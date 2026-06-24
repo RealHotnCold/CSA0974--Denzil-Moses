@@ -1,0 +1,4 @@
+@ECHO OFF
+javac OnlineCourseEnrollmentSystem.java
+ECHO OnlineCourseEnrollmentSystem is running
+java OnlineCourseEnrollmentSystem

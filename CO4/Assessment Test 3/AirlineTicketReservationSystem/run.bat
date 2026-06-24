@@ -1,0 +1,4 @@
+@ECHO OFF
+javac AirlineTicketReservationSystem.java
+ECHO AirlineTicketReservationSystem is running
+java AirlineTicketReservationSystem

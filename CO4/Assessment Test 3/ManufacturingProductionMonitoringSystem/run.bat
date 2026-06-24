@@ -1,0 +1,4 @@
+@ECHO OFF
+javac ProductionMonitoringSystem.java
+ECHO ProductionMonitoringSystem is running
+java ProductionMonitoringSystem
