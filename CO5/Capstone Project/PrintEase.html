@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PrintEase — Never Miss an Exam Due to Printing Delays</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #4F46E5; --primary-light: #818CF8; --primary-dark: #3730A3;
+      --primary-bg: #EEF2FF; --accent: #06B6D4;
+      --success: #10B981; --success-bg: #D1FAE5;
+      --warning: #F59E0B; --warning-bg: #FEF3C7;
+      --danger: #EF4444; --danger-bg: #FEE2E2;
+      --info: #3B82F6; --info-bg: #DBEAFE;
+      --gray-50: #F9FAFB; --gray-100: #F3F4F6; --gray-200: #E5E7EB;
+      --gray-300: #D1D5DB; --gray-400: #9CA3AF; --gray-500: #6B7280;
+      --gray-600: #4B5563; --gray-700: #374151; --gray-800: #1F2937;
+      --gray-900: #111827; --white: #FFFFFF;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow: 0 1px 3px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
+      --shadow-2xl: 0 25px 50px -12px rgba(0,0,0,0.25);
+      --radius-sm: 6px; --radius: 8px; --radius-md: 12px;
+      --radius-lg: 16px; --radius-xl: 24px;
+      --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      --font: 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--white); color: var(--gray-800); line-height: 1.6; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)} }
+    @keyframes scaleIn { from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)} }
+    @keyframes slideInRight { from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)} }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    @keyframes float { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
+    .container { max-width:1200px; margin:0 auto; padding:0 24px; }
+    .hidden { display:none !important; }
+    .w-full { width:100%; }
+    .mt-1 { margin-top:8px; } .mt-2 { margin-top:16px; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 24px; border:none; border-radius:var(--radius); font-family:var(--font); font-size:0.9rem; font-weight:600; cursor:pointer; transition:var(--transition); text-decoration:none; white-space:nowrap; position:relative; overflow:hidden; }
+    .btn-primary { background:var(--primary); color:var(--white); box-shadow:0 4px 14px rgba(79,70,229,0.4); }
+    .btn-primary:hover { background:var(--primary-dark); transform:translateY(-2px); box-shadow:0 6px 20px rgba(79,70,229,0.5); }
+    .btn-secondary { background:var(--white); color:var(--primary); border:2px solid var(--primary); }
+    .btn-secondary:hover { background:var(--primary-bg); transform:translateY(-2px); }
+    .btn-success { background:var(--success); color:var(--white); }
+    .btn-success:hover { background:#059669; transform:translateY(-2px); }
+    .btn-ghost { background:transparent; color:var(--gray-600); }
+    .btn-ghost:hover { background:var(--gray-100); color:var(--gray-800); }
+    .btn-danger { background:var(--danger); color:var(--white); }
+    .btn-sm { padding:6px 14px; font-size:0.8rem; }
+    .btn-lg { padding:14px 32px; font-size:1rem; }
+    .btn:disabled { opacity:0.6; cursor:not-allowed; transform:none !important; }
+    .btn:active { transform:scale(0.98); }
+    .form-group { margin-bottom:20px; }
+    .form-label { display:block; font-size:0.875rem; font-weight:600; color:var(--gray-700); margin-bottom:6px; }
+    .form-input { width:100%; padding:10px 14px; border:2px solid var(--gray-200); border-radius:var(--radius); font-family:var(--font); font-size:0.9rem; color:var(--gray-800); background:var(--white); transition:var(--transition); }
+    .form-input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(79,70,229,0.1); }
+    .form-input::placeholder { color:var(--gray-400); }
+    .form-select { width:100%; padding:10px 40px 10px 14px; border:2px solid var(--gray-200); border-radius:var(--radius); font-family:var(--font); font-size:0.9rem; color:var(--gray-800); background:var(--white); cursor:pointer; transition:var(--transition); appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
+    .form-select:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(79,70,229,0.1); }
+    .form-textarea { width:100%; padding:10px 14px; border:2px solid var(--gray-200); border-radius:var(--radius); font-family:var(--font); font-size:0.9rem; color:var(--gray-800); background:var(--white); transition:var(--transition); resize:vertical; min-height:80px; }
+    .form-textarea:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(79,70,229,0.1); }
+    .form-error { font-size:0.8rem; color:var(--danger); margin-top:4px; display:block; }
+    .form-radio-group { display:flex; gap:12px; flex-wrap:wrap; }
+    .form-radio-card { flex:1; min-width:120px; }
+    .form-radio-card input { display:none; }
+    .form-radio-card label { display:flex; align-items:center; justify-content:center; gap:8px; padding:12px 16px; border:2px solid var(--gray-200); border-radius:var(--radius); font-size:0.875rem; font-weight:500; cursor:pointer; transition:var(--transition); text-align:center; }
+    .form-radio-card input:checked + label { border-color:var(--primary); background:var(--primary-bg); color:var(--primary); }
+    .form-radio-card label:hover { border-color:var(--primary-light); }
+    .nav { position:fixed; top:0; left:0; right:0; z-index:1000; background:rgba(255,255,255,0.92); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--gray-200); transition:var(--transition); }
+    .nav.scrolled { box-shadow:var(--shadow-md); }
+    .nav-inner { max-width:1200px; margin:0 auto; padding:0 24px; height:72px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-brand { display:flex; align-items:center; gap:10px; text-decoration:none; font-size:1.4rem; font-weight:800; color:var(--gray-900); cursor:pointer; }
+    .nav-brand-icon { width:36px; height:36px; background:var(--primary); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:var(--white); font-size:1.1rem; }
+    .nav-links { display:flex; align-items:center; gap:8px; list-style:none; }
+    .nav-links a { text-decoration:none; color:var(--gray-600); font-size:0.9rem; font-weight:500; padding:8px 16px; border-radius:var(--radius); transition:var(--transition); cursor:pointer; display:block; }
+    .nav-links a:hover,.nav-links a.active { color:var(--primary); background:var(--primary-bg); }
+    .nav-actions { display:flex; align-items:center; gap:12px; }
+    .nav-mobile-toggle { display:none; width:40px; height:40px; border:none; background:none; cursor:pointer; flex-direction:column; align-items:center; justify-content:center; gap:5px; }
+    .nav-mobile-toggle span { width:22px; height:2px; background:var(--gray-700); border-radius:2px; transition:var(--transition); display:block; }
+    .mobile-menu { display:none; position:fixed; top:72px; left:0; right:0; background:var(--white); border-bottom:1px solid var(--gray-200); padding:16px; box-shadow:var(--shadow-lg); z-index:999; }
+    .mobile-menu.open { display:block; animation:fadeIn 0.3s ease-out; }
+    .mobile-menu a { display:block; padding:12px 16px; text-decoration:none; color:var(--gray-700); font-weight:500; border-radius:var(--radius); transition:var(--transition); cursor:pointer; margin-bottom:4px; }
+    .mobile-menu a:hover { background:var(--primary-bg); color:var(--primary); }
+    .mobile-menu .btn { width:100%; margin-top:8px; }
+    .user-menu { position:relative; }
+    .user-avatar { width:36px; height:36px; border-radius:50%; background:var(--primary); color:var(--white); display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; cursor:pointer; user-select:none; }
+    .user-dropdown { position:absolute; top:50px; right:0; background:var(--white); border-radius:var(--radius-md); box-shadow:var(--shadow-xl); border:1px solid var(--gray-200); width:220px; padding:8px; z-index:1100; display:none; }
+    .user-dropdown.open { display:block; animation:fadeIn 0.2s ease-out; }
+    .user-dropdown-header { padding:12px; border-bottom:1px solid var(--gray-200); margin-bottom:4px; }
+    .user-dropdown-header h4 { font-size:0.9rem; font-weight:700; color:var(--gray-800); }
+    .user-dropdown-header p { font-size:0.8rem; color:var(--gray-500); }
+    .user-dropdown a { display:flex; align-items:center; gap:10px; padding:10px 12px; text-decoration:none; color:var(--gray-600); font-size:0.875rem; border-radius:var(--radius); transition:var(--transition); cursor:pointer; }
+    .user-dropdown a:hover { background:var(--gray-100); color:var(--gray-800); }
+    .user-dropdown a.danger { color:var(--danger); }
+    .user-dropdown a.danger:hover { background:var(--danger-bg); }
+    .page { display:none; min-height:100vh; }
+    .page.active { display:block; }
+    .hero { padding:140px 0 80px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:-50%; right:-20%; width:600px; height:600px; background:radial-gradient(circle,rgba(79,70,229,0.08) 0%,transparent 70%); border-radius:50%; pointer-events:none; }
+    .hero-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+    .hero-content { position:relative; z-index:1; animation:fadeInUp 0.8s ease-out; }
+    .hero-badge { display:inline-flex; align-items:center; gap:8px; padding:6px 16px; background:var(--primary-bg); color:var(--primary); border-radius:20px; font-size:0.85rem; font-weight:600; margin-bottom:24px; }
+    .hero h1 { font-size:3.2rem; font-weight:800; color:var(--gray-900); line-height:1.1; margin-bottom:20px; letter-spacing:-0.03em; }
+    .hero h1 .highlight { background:linear-gradient(135deg,var(--primary),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero p { font-size:1.1rem; color:var(--gray-500); line-height:1.7; margin-bottom:36px; }
+    .hero-actions { display:flex; gap:16px; flex-wrap:wrap; }
+    .hero-visual { animation:fadeIn 0.8s ease-out 0.3s both; }
+    .hero-feature-card { background:var(--white); border-radius:var(--radius-lg); box-shadow:var(--shadow-2xl); border:1px solid var(--gray-200); padding:28px; animation:float 4s ease-in-out infinite; }
+    .hero-feature-card-title { font-size:0.7rem; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:16px; }
+    .hfc-row { display:flex; align-items:center; gap:16px; padding:14px 0; border-bottom:1px solid var(--gray-100); }
+    .hfc-row:last-child { border-bottom:none; padding-bottom:0; }
+    .hfc-icon { font-size:1.4rem; width:44px; height:44px; display:flex; align-items:center; justify-content:center; background:var(--primary-bg); border-radius:var(--radius); flex-shrink:0; }
+    .hfc-title { font-weight:700; font-size:0.95rem; color:var(--gray-800); }
+    .hfc-sub { font-size:0.78rem; color:var(--gray-500); margin-top:2px; }
+    .section { padding:80px 0; }
+    .section-bg { background:var(--gray-50); }
+    .section-header { text-align:center; max-width:600px; margin:0 auto 60px; }
+    .section-label { display:inline-block; font-size:0.8rem; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px; }
+    .section-title { font-size:2.2rem; font-weight:800; color:var(--gray-900); margin-bottom:16px; letter-spacing:-0.02em; }
+    .section-desc { font-size:1rem; color:var(--gray-500); line-height:1.7; }
+    .steps-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
+    .step-card { text-align:center; padding:32px 20px; border-radius:var(--radius-md); border:1px solid var(--gray-200); background:var(--white); transition:var(--transition); }
+    .step-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-4px); }
+    .step-number { width:56px; height:56px; border-radius:50%; background:var(--primary); color:var(--white); display:flex; align-items:center; justify-content:center; font-size:1.2rem; font-weight:800; margin:0 auto 20px; box-shadow:0 4px 14px rgba(79,70,229,0.3); }
+    .step-card h3 { font-size:1.05rem; font-weight:700; color:var(--gray-800); margin-bottom:8px; }
+    .step-card p { font-size:0.9rem; color:var(--gray-500); line-height:1.6; }
+    .features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+    .feature-card { padding:32px; border-radius:var(--radius-md); border:1px solid var(--gray-200); transition:var(--transition); background:var(--white); }
+    .feature-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-4px); border-color:transparent; }
+    .feature-icon { width:48px; height:48px; border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-bottom:20px; }
+    .fi-1{background:var(--primary-bg)}.fi-2{background:var(--success-bg)}.fi-3{background:var(--warning-bg)}.fi-4{background:#CFFAFE}.fi-5{background:var(--danger-bg)}.fi-6{background:var(--info-bg)}
+    .feature-card h3 { font-size:1.05rem; font-weight:700; color:var(--gray-800); margin-bottom:8px; }
+    .feature-card p { font-size:0.9rem; color:var(--gray-500); line-height:1.6; }
+    .cta-section { padding:80px 0; }
+    .cta-box { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); border-radius:var(--radius-xl); padding:60px; text-align:center; position:relative; overflow:hidden; }
+    .cta-box::before { content:''; position:absolute; top:-50%; right:-20%; width:400px; height:400px; background:rgba(255,255,255,0.08); border-radius:50%; pointer-events:none; }
+    .cta-box h2 { font-size:2.2rem; font-weight:800; color:var(--white); margin-bottom:16px; position:relative; z-index:1; }
+    .cta-box p { font-size:1.1rem; color:rgba(255,255,255,0.85); margin-bottom:32px; position:relative; z-index:1; }
+    .cta-actions { position:relative; z-index:1; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+    .btn-white { background:var(--white); color:var(--primary); }
+    .btn-white:hover { background:var(--gray-100); transform:translateY(-2px); }
+    .footer { background:var(--gray-900); color:var(--gray-400); padding:40px 0 30px; }
+    .footer-bottom { display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; flex-wrap:wrap; gap:12px; }
+    .auth-page { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:100px 24px 40px; background:var(--gray-50); }
+    .auth-container { width:100%; max-width:440px; animation:scaleIn 0.4s ease-out; }
+    .auth-card { background:var(--white); border-radius:var(--radius-lg); padding:40px; box-shadow:var(--shadow-lg); border:1px solid var(--gray-200); }
+    .auth-brand { font-size:1.5rem; font-weight:800; color:var(--primary); text-align:center; margin-bottom:20px; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .auth-header { text-align:center; margin-bottom:24px; }
+    .auth-header h2 { font-size:1.5rem; font-weight:800; color:var(--gray-900); margin-bottom:8px; }
+    .auth-header p { font-size:0.9rem; color:var(--gray-500); }
+    .auth-tabs { display:flex; background:var(--gray-100); border-radius:var(--radius); padding:4px; margin-bottom:24px; }
+    .auth-tab { flex:1; padding:10px; border:none; background:none; font-family:var(--font); font-size:0.85rem; font-weight:600; color:var(--gray-500); cursor:pointer; border-radius:6px; transition:var(--transition); }
+    .auth-tab.active { background:var(--white); color:var(--gray-900); box-shadow:var(--shadow-sm); }
+    .auth-footer { text-align:center; margin-top:20px; font-size:0.9rem; color:var(--gray-500); }
+    .auth-footer a { color:var(--primary); text-decoration:none; font-weight:600; cursor:pointer; }
+    .auth-footer a:hover { text-decoration:underline; }
+    .dashboard-layout { display:flex; min-height:100vh; padding-top:72px; }
+    .sidebar { width:260px; background:var(--white); border-right:1px solid var(--gray-200); padding:24px 0; position:fixed; top:72px; bottom:0; overflow-y:auto; z-index:100; transition:var(--transition); }
+    .sidebar-nav { list-style:none; padding:0 12px; }
+    .sidebar-section-title { padding:0 16px; margin-bottom:6px; font-size:0.7rem; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.1em; margin-top:24px; }
+    .sidebar-section-title:first-of-type { margin-top:0; }
+    .sidebar-item a { display:flex; align-items:center; gap:12px; padding:10px 16px; text-decoration:none; color:var(--gray-600); font-size:0.9rem; font-weight:500; border-radius:var(--radius); transition:var(--transition); margin-bottom:2px; cursor:pointer; }
+    .sidebar-item a:hover { background:var(--gray-100); color:var(--gray-800); }
+    .sidebar-item a.active { background:var(--primary-bg); color:var(--primary); font-weight:600; }
+    .sidebar-icon { width:20px; text-align:center; flex-shrink:0; }
+    .dashboard-main { flex:1; margin-left:260px; padding:32px; background:var(--gray-50); min-height:calc(100vh - 72px); }
+    .dashboard-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; flex-wrap:wrap; gap:16px; }
+    .dashboard-title h1 { font-size:1.6rem; font-weight:800; color:var(--gray-900); }
+    .dashboard-title p { font-size:0.9rem; color:var(--gray-500); margin-top:4px; }
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-bottom:28px; }
+    .stat-card { background:var(--white); border-radius:var(--radius-md); padding:24px; border:1px solid var(--gray-200); transition:var(--transition); position:relative; overflow:hidden; }
+    .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; }
+    .stat-card.primary::before{background:var(--primary)}.stat-card.success::before{background:var(--success)}.stat-card.warning::before{background:var(--warning)}.stat-card.danger::before{background:var(--danger)}.stat-card.info::before{background:var(--info)}
+    .stat-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-2px); }
+    .stat-icon { width:48px; height:48px; border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; font-size:1.25rem; margin-bottom:16px; }
+    .stat-card.primary .stat-icon{background:var(--primary-bg)}.stat-card.success .stat-icon{background:var(--success-bg)}.stat-card.warning .stat-icon{background:var(--warning-bg)}.stat-card.danger .stat-icon{background:var(--danger-bg)}.stat-card.info .stat-icon{background:var(--info-bg)}
+    .stat-value { font-size:2rem; font-weight:800; color:var(--gray-900); line-height:1; margin-bottom:4px; }
+    .stat-label { font-size:0.85rem; color:var(--gray-500); font-weight:500; }
+    .badge { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:600; white-space:nowrap; }
+    .badge::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
+    .badge-pending{background:var(--warning-bg);color:#B45309}.badge-accepted{background:var(--info-bg);color:#1D4ED8}.badge-printing{background:#E0E7FF;color:var(--primary)}.badge-printed{background:#CFFAFE;color:#0891B2}.badge-ready{background:var(--success-bg);color:#047857}.badge-delivered{background:var(--gray-100);color:var(--gray-600)}.badge-success{background:var(--success-bg);color:#047857}
+    .table-container { background:var(--white); border-radius:var(--radius-md); border:1px solid var(--gray-200); overflow:hidden; margin-bottom:24px; }
+    .table-header { padding:20px 24px; border-bottom:1px solid var(--gray-200); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+    .table-header h3 { font-size:1.05rem; font-weight:700; color:var(--gray-900); }
+    .table-filters { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .table-search { padding:8px 14px; border:2px solid var(--gray-200); border-radius:var(--radius); font-family:var(--font); font-size:0.85rem; width:220px; transition:var(--transition); }
+    .table-search:focus { outline:none; border-color:var(--primary); }
+    .filter-select { padding:8px 32px 8px 12px; border:2px solid var(--gray-200); border-radius:var(--radius); font-family:var(--font); font-size:0.85rem; background:var(--white); appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 8px center; cursor:pointer; }
+    table { width:100%; border-collapse:collapse; }
+    thead { background:var(--gray-50); }
+    th { padding:12px 20px; text-align:left; font-size:0.75rem; font-weight:700; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.05em; border-bottom:1px solid var(--gray-200); white-space:nowrap; }
+    td { padding:14px 20px; font-size:0.875rem; color:var(--gray-700); border-bottom:1px solid var(--gray-100); }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:var(--gray-50); }
+    .table-checkbox { width:18px; height:18px; cursor:pointer; accent-color:var(--primary); }
+    .table-responsive { overflow-x:auto; }
+    .table-action-btn { width:30px; height:30px; border:none; background:none; cursor:pointer; border-radius:var(--radius-sm); display:inline-flex; align-items:center; justify-content:center; transition:var(--transition); color:var(--gray-500); font-size:0.85rem; }
+    .table-action-btn:hover { background:var(--gray-100); color:var(--gray-800); }
+    .empty-td { padding:48px 24px; text-align:center; color:var(--gray-400); font-size:0.9rem; }
+    .empty-td a { color:var(--primary); cursor:pointer; text-decoration:underline; }
+    .batch-actions { padding:14px 20px; background:var(--primary-bg); border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:0.85rem; font-weight:600; color:var(--primary); }
+    .upload-zone { border:2px dashed var(--gray-300); border-radius:var(--radius-md); padding:40px; text-align:center; cursor:pointer; transition:var(--transition); position:relative; background:var(--gray-50); }
+    .upload-zone:hover,.upload-zone.drag-over { border-color:var(--primary); background:var(--primary-bg); }
+    .upload-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+    .upload-icon { font-size:2.5rem; color:var(--gray-400); margin-bottom:16px; }
+    .upload-zone h3 { font-size:1rem; font-weight:600; color:var(--gray-700); margin-bottom:8px; }
+    .upload-zone p { font-size:0.85rem; color:var(--gray-500); }
+    .file-item { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--gray-50); border-radius:var(--radius); border:1px solid var(--gray-200); margin-top:8px; animation:fadeIn 0.3s ease-out; }
+    .file-icon-box { width:40px; height:40px; border-radius:var(--radius); background:var(--danger-bg); color:var(--danger); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.7rem; flex-shrink:0; }
+    .file-info { flex:1; min-width:0; }
+    .file-name { font-size:0.85rem; font-weight:600; color:var(--gray-800); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .file-size { font-size:0.75rem; color:var(--gray-500); }
+    .file-remove { width:28px; height:28px; border:none; background:none; cursor:pointer; color:var(--gray-400); border-radius:50%; display:flex; align-items:center; justify-content:center; transition:var(--transition); flex-shrink:0; }
+    .file-remove:hover { background:var(--danger-bg); color:var(--danger); }
+    .detail-section { background:var(--white); border-radius:var(--radius-md); border:1px solid var(--gray-200); padding:24px; margin-bottom:20px; }
+    .detail-section h3 { font-size:1rem; font-weight:700; color:var(--gray-900); margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--gray-200); }
+    .detail-row { display:flex; justify-content:space-between; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--gray-100); gap:16px; }
+    .detail-row:last-child { border-bottom:none; }
+    .detail-row label { font-size:0.85rem; color:var(--gray-500); font-weight:500; flex-shrink:0; }
+    .detail-row span { font-size:0.85rem; color:var(--gray-800); font-weight:600; text-align:right; word-break:break-word; }
+    .token-display { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); border-radius:var(--radius-lg); padding:28px; text-align:center; color:var(--white); position:relative; overflow:hidden; }
+    .token-display::before { content:''; position:absolute; top:-40%; right:-20%; width:200px; height:200px; background:rgba(255,255,255,0.08); border-radius:50%; pointer-events:none; }
+    .token-display label { font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.8; display:block; }
+    .token-number { font-size:2.8rem; font-weight:800; font-family:'Courier New',monospace; margin-top:8px; position:relative; z-index:1; letter-spacing:0.05em; }
+    .timeline { position:relative; padding-left:28px; margin-top:16px; }
+    .timeline::before { content:''; position:absolute; left:9px; top:0; bottom:0; width:2px; background:var(--gray-200); }
+    .timeline-item { position:relative; padding-bottom:24px; }
+    .timeline-item:last-child { padding-bottom:0; }
+    .timeline-dot { position:absolute; left:-22px; top:3px; width:14px; height:14px; border-radius:50%; border:3px solid var(--gray-300); background:var(--white); }
+    .timeline-item.done .timeline-dot { background:var(--success); border-color:var(--success); }
+    .timeline-item.current .timeline-dot { background:var(--primary); border-color:var(--primary); box-shadow:0 0 0 4px rgba(79,70,229,0.2); }
+    .timeline-content h4 { font-size:0.9rem; font-weight:600; color:var(--gray-700); }
+    .timeline-content p { font-size:0.78rem; color:var(--gray-400); margin-top:2px; }
+    .timeline-item.done .timeline-content h4 { color:var(--success); }
+    .timeline-item.current .timeline-content h4 { color:var(--primary); }
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:2000; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .modal { background:var(--white); border-radius:var(--radius-lg); width:100%; max-width:540px; max-height:90vh; overflow-y:auto; animation:scaleIn 0.3s ease-out; }
+    .modal-header { padding:24px 24px 0; display:flex; justify-content:space-between; align-items:center; }
+    .modal-header h3 { font-size:1.15rem; font-weight:700; color:var(--gray-900); }
+    .modal-close { width:32px; height:32px; border:none; background:none; cursor:pointer; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--gray-400); font-size:1.2rem; transition:var(--transition); }
+    .modal-close:hover { background:var(--gray-100); color:var(--gray-800); }
+    .modal-body { padding:24px; }
+    .modal-footer { padding:0 24px 24px; display:flex; justify-content:flex-end; gap:8px; }
+    #toast-container { position:fixed; top:88px; right:24px; z-index:3000; display:flex; flex-direction:column; gap:8px; pointer-events:none; }
+    .toast { display:flex; align-items:center; gap:12px; padding:14px 18px; background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow-lg); border:1px solid var(--gray-200); min-width:300px; max-width:400px; animation:slideInRight 0.4s ease-out; border-left:4px solid; pointer-events:all; }
+    .toast.success{border-left-color:var(--success)}.toast.error{border-left-color:var(--danger)}.toast.warning{border-left-color:var(--warning)}.toast.info{border-left-color:var(--info)}
+    .toast-icon { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.8rem; font-weight:700; }
+    .toast.success .toast-icon{background:var(--success-bg);color:var(--success)}.toast.error .toast-icon{background:var(--danger-bg);color:var(--danger)}.toast.warning .toast-icon{background:var(--warning-bg);color:var(--warning)}.toast.info .toast-icon{background:var(--info-bg);color:var(--info)}
+    .toast-content { flex:1; }
+    .toast-title { font-size:0.85rem; font-weight:700; color:var(--gray-800); }
+    .toast-msg { font-size:0.78rem; color:var(--gray-500); margin-top:1px; }
+    .toast-close { width:22px; height:22px; border:none; background:none; cursor:pointer; color:var(--gray-400); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; }
+    .toast-close:hover { background:var(--gray-100); }
+    .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,0.3); border-top-color:rgba(255,255,255,0.9); border-radius:50%; animation:spin 0.6s linear infinite; display:inline-block; flex-shrink:0; }
+    .progress-mini { width:60px; height:4px; background:var(--gray-200); border-radius:2px; overflow:hidden; margin-top:5px; }
+    .pmb { height:100%; border-radius:2px; transition:width 0.5s ease; }
+    .pmb-pending{width:16%;background:var(--warning)}.pmb-accepted{width:33%;background:var(--info)}.pmb-printing{width:50%;background:var(--primary)}.pmb-printed{width:66%;background:var(--accent)}.pmb-ready{width:83%;background:var(--success)}.pmb-delivered{width:100%;background:var(--gray-400)}
+    .page-hero { padding:140px 0 60px; text-align:center; background:var(--gray-50); border-bottom:1px solid var(--gray-200); }
+    .page-hero h1 { font-size:2.5rem; font-weight:800; color:var(--gray-900); margin-bottom:16px; }
+    .page-hero p { font-size:1.1rem; color:var(--gray-500); max-width:600px; margin:0 auto; }
+    .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+    .about-text h2 { font-size:1.8rem; font-weight:800; color:var(--gray-900); margin-bottom:20px; }
+    .about-text p { font-size:1rem; color:var(--gray-600); line-height:1.8; margin-bottom:16px; }
+    .contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:40px; padding:60px 0; }
+    .contact-info h2 { font-size:1.8rem; font-weight:800; color:var(--gray-900); margin-bottom:16px; }
+    .contact-info p { font-size:1rem; color:var(--gray-600); line-height:1.8; margin-bottom:24px; }
+    .contact-item { display:flex; align-items:center; gap:16px; padding:12px 0; }
+    .ci-icon { width:44px; height:44px; border-radius:var(--radius); background:var(--primary-bg); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+    .contact-item h4 { font-size:0.9rem; font-weight:600; color:var(--gray-800); }
+    .contact-item p { font-size:0.85rem; color:var(--gray-500); margin-bottom:0; }
+    .contact-form-card { background:var(--white); padding:32px; border-radius:var(--radius-md); border:1px solid var(--gray-200); box-shadow:var(--shadow); }
+    .contact-form-card h3 { font-size:1.2rem; font-weight:700; color:var(--gray-900); margin-bottom:24px; }
+    ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--gray-100)}::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--gray-400)}
+    @media(max-width:1024px){.stats-grid{grid-template-columns:repeat(2,1fr)}.features-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:768px){
+      .hero{padding:110px 0 60px}.hero h1{font-size:2rem}.hero-grid{grid-template-columns:1fr;gap:40px}
+      .steps-grid{grid-template-columns:1fr 1fr}.features-grid{grid-template-columns:1fr}
+      .about-grid,.contact-grid{grid-template-columns:1fr;gap:32px}
+      .stats-grid{grid-template-columns:1fr 1fr}
+      .sidebar{transform:translateX(-100%);box-shadow:var(--shadow-xl)}
+      .sidebar.sidebar-open{transform:translateX(0)}
+      .dashboard-main{margin-left:0;padding:20px}
+      .nav-links{display:none}.nav-actions .btn{display:none}.nav-mobile-toggle{display:flex}
+      .table-search{width:160px}.cta-box{padding:40px 24px}
+    }
+    @media(max-width:480px){.steps-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr}.footer-bottom{flex-direction:column;text-align:center}.hero h1{font-size:1.8rem}}
+    .share-link-box { background:var(--gray-50); border:1px solid var(--gray-200); border-radius:var(--radius); padding:12px 16px; font-family:'Courier New',monospace; font-size:0.8rem; color:var(--gray-700); word-break:break-all; margin-top:12px; }
+    .file-select-row { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:var(--radius); border:1px solid var(--gray-200); margin-bottom:6px; background:var(--white); transition:var(--transition); }
+    .file-select-row:hover { background:var(--gray-50); }
+    .file-select-row input[type="checkbox"] { accent-color:var(--primary); width:16px; height:16px; cursor:pointer; flex-shrink:0; }
+    .file-select-label { font-size:0.85rem; font-weight:500; color:var(--gray-700); flex:1; cursor:pointer; }
+    .file-select-size { font-size:0.75rem; color:var(--gray-400); }
+  </style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <div class="nav-inner">
+    <div class="nav-brand" onclick="App.go('landing')">
+      <div class="nav-brand-icon">⎙</div>PrintEase
+    </div>
+    <ul class="nav-links">
+      <li><a onclick="App.go('landing')" id="nl-landing" class="active">Home</a></li>
+      <li><a onclick="App.go('about')" id="nl-about">About</a></li>
+      <li><a onclick="App.go('contact')" id="nl-contact">Contact</a></li>
+    </ul>
+    <div class="nav-actions" id="navActions">
+      <button class="btn btn-ghost" id="navLoginBtn" onclick="App.go('login')">Log In</button>
+      <button class="btn btn-primary" id="navRegisterBtn" onclick="App.go('register')">Get Started</button>
+      <div class="user-menu hidden" id="userMenuWrap">
+        <div class="user-avatar" id="userAvatar" onclick="App.toggleDropdown()">??</div>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="user-dropdown-header">
+            <h4 id="ddUsername">—</h4>
+            <p id="ddRole">—</p>
+          </div>
+          <a onclick="App.gotoDashboard()">📊 Dashboard</a>
+          <a class="danger" onclick="App.logout()">🚪 Logout</a>
+        </div>
+      </div>
+    </div>
+    <button class="nav-mobile-toggle" id="mobileToggle" onclick="App.toggleMobile()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a onclick="App.go('landing');App.closeMobile()">🏠 Home</a>
+  <a onclick="App.go('about');App.closeMobile()">ℹ️ About</a>
+  <a onclick="App.go('contact');App.closeMobile()">📧 Contact</a>
+  <button class="btn btn-ghost w-full" onclick="App.go('login');App.closeMobile()">Log In</button>
+  <button class="btn btn-primary w-full" onclick="App.go('register');App.closeMobile()">Get Started</button>
+</div>
+
+<!-- LANDING -->
+<div id="page-landing" class="page active">
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <div class="hero-badge">🎓 Built for Hostel Students</div>
+          <h1>Never Miss an Exam Due to <span class="highlight">Printing Delays</span></h1>
+          <p>Upload your hall ticket, assignment, or academic document and receive organized printing services through partnered print shops. No more morning queues, no more stress.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary btn-lg" onclick="App.go('register')">Start Printing →</button>
+            <button class="btn btn-secondary btn-lg" onclick="App.go('about')">Learn More</button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-feature-card">
+            <div class="hero-feature-card-title">⎙ PrintEase — How it works</div>
+            <div class="hfc-row"><div class="hfc-icon">📤</div><div><div class="hfc-title">Upload at Night</div><div class="hfc-sub">Submit PDFs from your hostel room anytime</div></div></div>
+            <div class="hfc-row"><div class="hfc-icon">🎫</div><div><div class="hfc-title">Get Your Token</div><div class="hfc-sub">Unique token generated instantly for tracking</div></div></div>
+            <div class="hfc-row"><div class="hfc-icon">🖨️</div><div><div class="hfc-title">Shop Prints It</div><div class="hfc-sub">Shopkeeper processes all orders from dashboard</div></div></div>
+            <div class="hfc-row"><div class="hfc-icon">✅</div><div><div class="hfc-title">Collect & Go</div><div class="hfc-sub">Ready before your exam morning</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">How It Works</span>
+        <h2 class="section-title">4 Simple Steps — Zero Morning Stress</h2>
+        <p class="section-desc">Submit orders at night. Shopkeeper prints. You collect. No queues. No chaos.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card"><div class="step-number">1</div><h3>Upload Document</h3><p>Upload your PDFs from your hostel room at any time of night. Multiple files supported.</p></div>
+        <div class="step-card"><div class="step-number">2</div><h3>Set Preferences</h3><p>Choose B&W or Color, number of copies, single or double-sided printing.</p></div>
+        <div class="step-card"><div class="step-number">3</div><h3>Receive Token</h3><p>A unique token is generated. The print shop receives your order instantly.</p></div>
+        <div class="step-card"><div class="step-number">4</div><h3>Collect Prints</h3><p>Walk in, show your token, pick up your perfectly printed documents.</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="section section-bg">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Features</span>
+        <h2 class="section-title">Everything You Need for Hassle-Free Printing</h2>
+        <p class="section-desc">A platform designed to eliminate chaos between students and print shops during exam season.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card"><div class="feature-icon fi-1">📄</div><h3>Easy Document Upload</h3><p>Drag & drop or browse PDF files. Upload from phone or laptop, even at midnight.</p></div>
+        <div class="feature-card"><div class="feature-icon fi-2">🎫</div><h3>Auto Token Generation</h3><p>Every order gets a unique token for quick identification and zero confusion at the shop.</p></div>
+        <div class="feature-card"><div class="feature-icon fi-3">📊</div><h3>Real-Time Tracking</h3><p>Track your order live from Pending to Delivered with a beautiful status timeline.</p></div>
+        <div class="feature-card"><div class="feature-icon fi-4">🏪</div><h3>Centralized Shop Dashboard</h3><p>Shopkeepers replace 100 WhatsApp messages with one organized, clean dashboard.</p></div>
+        <div class="feature-card"><div class="feature-icon fi-5">📦</div><h3>Batch Processing</h3><p>Shops manage, print, and track all orders in organized batches with bulk actions.</p></div>
+        <div class="feature-card"><div class="feature-icon fi-6">🏠</div><h3>Hostel-Aware System</h3><p>Orders organized by hostel name and room number for accurate sorting and delivery.</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-box">
+        <h2>Ready to Print Without the Stress?</h2>
+        <p>Sign up in 30 seconds. Upload tonight. Collect in the morning. Never miss an exam.</p>
+        <div class="cta-actions">
+          <button class="btn btn-white btn-lg" onclick="App.go('register')">Create Free Account →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>© 2025 PrintEase. All rights reserved.</p>
+        <p>Made with ❤️ for hostel students everywhere</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- LOGIN -->
+<div id="page-login" class="page">
+  <div class="auth-page">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-brand"><span>⎙</span> PrintEase</div>
+        <div class="auth-header"><h2>Welcome Back</h2><p>Log in to your account to continue</p></div>
+        <div class="auth-tabs" id="loginRoleTabs">
+          <button class="auth-tab active" data-role="student">Student</button>
+          <button class="auth-tab" data-role="shopkeeper">Shopkeeper</button>
+          <button class="auth-tab" data-role="admin">Admin</button>
+        </div>
+        <form id="loginForm" onsubmit="Auth.login(event)">
+          <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-input" id="loginEmail" placeholder="you@example.com" required /></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required /></div>
+          <span class="form-error" id="loginError"></span>
+          <button type="submit" class="btn btn-primary w-full btn-lg" id="loginBtn" style="margin-top:8px">Log In</button>
+        </form>
+        <div class="auth-footer">Don't have an account? <a onclick="App.go('register')">Sign up free</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div id="page-register" class="page">
+  <div class="auth-page">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-brand"><span>⎙</span> PrintEase</div>
+        <div class="auth-header"><h2>Create Account</h2><p>Get started with PrintEase today</p></div>
+        <div class="auth-tabs" id="registerRoleTabs">
+          <button class="auth-tab active" data-role="student">Student</button>
+          <button class="auth-tab" data-role="shopkeeper">Shopkeeper</button>
+        </div>
+        <form id="registerForm" onsubmit="Auth.register(event)">
+          <div class="form-group"><label class="form-label">Username</label><input type="text" class="form-input" id="regUsername" placeholder="e.g. SaranRaj" required /></div>
+          <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-input" id="regEmail" placeholder="you@example.com" required /></div>
+          <div id="studentRegFields">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="form-group">
+                <label class="form-label">Hostel</label>
+                <select class="form-select" id="regHostel">
+                  <option value="">Select hostel</option>
+                  <option>Krishna</option><option>Noyal</option><option>Vaigai</option>
+                  <option>Siruvani</option><option>Kaveri</option><option>Porunai</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">Room Number</label><input type="text" class="form-input" id="regRoom" placeholder="e.g. 204" /></div>
+            </div>
+          </div>
+          <div id="shopRegFields" class="hidden">
+            <div class="form-group"><label class="form-label">Shop Name</label><input type="text" class="form-input" id="regShopName" placeholder="e.g. Campus Print Hub" /></div>
+          </div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="regPassword" placeholder="Create a strong password" required /></div>
+          <span class="form-error" id="registerError"></span>
+          <button type="submit" class="btn btn-primary w-full btn-lg" id="registerBtn" style="margin-top:8px">Create Account</button>
+        </form>
+        <div class="auth-footer">Already have an account? <a onclick="App.go('login')">Log in</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENT DASHBOARD -->
+<div id="page-student-dashboard" class="page">
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="studentSidebar">
+      <ul class="sidebar-nav">
+        <li class="sidebar-section-title">Menu</li>
+        <li class="sidebar-item"><a onclick="SD.show('overview')" id="sn-overview" class="active"><span class="sidebar-icon">📊</span>Dashboard</a></li>
+        <li class="sidebar-item"><a onclick="SD.show('upload')" id="sn-upload"><span class="sidebar-icon">📤</span>New Order</a></li>
+        <li class="sidebar-item"><a onclick="SD.show('orders')" id="sn-orders"><span class="sidebar-icon">📋</span>My Orders</a></li>
+        <li class="sidebar-item"><a onclick="SD.show('tracking')" id="sn-tracking"><span class="sidebar-icon">🔍</span>Track Order</a></li>
+        <li class="sidebar-section-title">Account</li>
+        <li class="sidebar-item"><a onclick="SD.show('profile')" id="sn-profile"><span class="sidebar-icon">👤</span>Profile</a></li>
+        <li class="sidebar-item"><a onclick="App.logout()"><span class="sidebar-icon">🚪</span>Logout</a></li>
+      </ul>
+    </aside>
+    <main class="dashboard-main">
+      <!-- OVERVIEW -->
+      <div id="sd-overview">
+        <div class="dashboard-header">
+          <div class="dashboard-title">
+            <h1>Welcome, <span id="sdWelcomeName" style="color:var(--primary)">—</span> 👋</h1>
+            <p>Here's your printing activity overview</p>
+          </div>
+          <button class="btn btn-primary" onclick="SD.show('upload')">📤 New Order</button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card primary"><div class="stat-icon">📄</div><div class="stat-value" id="sdStatTotal">0</div><div class="stat-label">Total Orders</div></div>
+          <div class="stat-card success"><div class="stat-icon">✅</div><div class="stat-value" id="sdStatCompleted">0</div><div class="stat-label">Completed</div></div>
+          <div class="stat-card warning"><div class="stat-icon">⏳</div><div class="stat-value" id="sdStatActive">0</div><div class="stat-label">Active Orders</div></div>
+          <div class="stat-card info"><div class="stat-icon">🎫</div><div class="stat-value" id="sdStatToken" style="font-size:1.1rem;font-family:monospace">—</div><div class="stat-label">Latest Token</div></div>
+        </div>
+        <div class="table-container">
+          <div class="table-header">
+            <h3>Recent Orders</h3>
+            <button class="btn btn-ghost btn-sm" onclick="SD.show('orders')">View All →</button>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>Token</th><th>Files</th><th>Hostel</th><th>Type</th><th>Copies</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="sdRecentBody"><tr><td colspan="7" class="empty-td">No orders yet. <a onclick="SD.show('upload')">Submit your first order →</a></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- UPLOAD -->
+      <div id="sd-upload" class="hidden">
+        <div class="dashboard-header">
+          <div class="dashboard-title"><h1>New Print Order</h1><p>Upload your documents and configure options</p></div>
+        </div>
+        <div style="max-width:680px">
+          <form id="uploadForm" onsubmit="SD.submitOrder(event)">
+            <div class="detail-section">
+              <h3>📄 Upload Documents</h3>
+              <div class="upload-zone" id="uploadZone">
+                <input type="file" id="fileInput" accept=".pdf" multiple />
+                <div class="upload-icon">📁</div>
+                <h3>Drag & drop PDF files here</h3>
+                <p>Or click to browse &nbsp;•&nbsp; PDF only &nbsp;•&nbsp; Max 25MB each &nbsp;•&nbsp; Multiple files supported</p>
+              </div>
+              <div id="fileList"></div>
+            </div>
+            <div class="detail-section">
+              <h3>⚙️ Print Options</h3>
+              <div class="form-group">
+                <label class="form-label">Print Type</label>
+                <div class="form-radio-group">
+                  <div class="form-radio-card"><input type="radio" name="print_type" id="opt_bw" value="bw" checked /><label for="opt_bw">🖨️ Black & White</label></div>
+                  <div class="form-radio-card"><input type="radio" name="print_type" id="opt_color" value="color" /><label for="opt_color">🎨 Color</label></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Print Side</label>
+                <div class="form-radio-group">
+                  <div class="form-radio-card"><input type="radio" name="print_side" id="opt_single" value="single" checked /><label for="opt_single">📃 Single Side</label></div>
+                  <div class="form-radio-card"><input type="radio" name="print_side" id="opt_double" value="double" /><label for="opt_double">📑 Double Side</label></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Number of Copies</label>
+                <input type="number" class="form-input" id="copiesInput" min="1" max="50" value="1" style="max-width:120px" />
+              </div>
+            </div>
+            <div class="detail-section">
+              <h3>🏠 Hostel Details</h3>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div class="form-group">
+                  <label class="form-label">Hostel</label>
+                  <select class="form-select" id="orderHostel" required>
+                    <option value="">Select your hostel</option>
+                    <option>Krishna</option><option>Noyal</option><option>Vaigai</option>
+                    <option>Siruvani</option><option>Kaveri</option><option>Porunai</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Room Number</label><input type="text" class="form-input" id="orderRoom" placeholder="e.g. 204" required /></div>
+              </div>
+              <div class="form-group"><label class="form-label">Special Instructions (optional)</label><textarea class="form-textarea" id="orderNotes" placeholder="Any special instructions for the shopkeeper..."></textarea></div>
+            </div>
+            <span class="form-error" id="uploadError"></span>
+            <button type="submit" class="btn btn-primary btn-lg w-full" id="submitOrderBtn" style="margin-top:8px">📤 Submit Print Order</button>
+          </form>
+        </div>
+      </div>
+      <!-- ORDERS -->
+      <div id="sd-orders" class="hidden">
+        <div class="dashboard-header">
+          <div class="dashboard-title"><h1>My Orders</h1><p>Submitted by: <strong id="sdOrdersUsername" style="color:var(--primary)">—</strong></p></div>
+          <button class="btn btn-primary" onclick="SD.show('upload')">📤 New Order</button>
+        </div>
+        <div class="table-container">
+          <div class="table-header">
+            <h3>Order History</h3>
+            <select class="filter-select" id="sdOrderFilter" onchange="SD.loadOrders(this.value)">
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option><option value="accepted">Accepted</option>
+              <option value="printing">Printing</option><option value="printed">Printed</option>
+              <option value="ready">Ready</option><option value="delivered">Delivered</option>
+            </select>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>Token</th><th>Files</th><th>Hostel</th><th>Room</th><th>Type</th><th>Copies</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+              <tbody id="sdOrdersBody"><tr><td colspan="9" class="empty-td">No orders found.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- TRACKING -->
+      <div id="sd-tracking" class="hidden">
+        <div class="dashboard-header"><div class="dashboard-title"><h1>Track Order</h1><p>Enter your token number to see live status</p></div></div>
+        <div style="max-width:600px">
+          <div class="detail-section">
+            <div style="display:flex;gap:12px">
+              <input type="text" class="form-input" id="trackInput" placeholder="Enter token e.g. PE-ABC123" style="text-transform:uppercase" />
+              <button class="btn btn-primary" onclick="SD.track()">Track</button>
+            </div>
+            <span class="form-error" id="trackError" style="margin-top:8px"></span>
+          </div>
+          <div id="trackResult" class="hidden">
+            <div class="token-display" style="margin-bottom:20px"><label>Your Token Number</label><div class="token-number" id="trackToken">—</div></div>
+            <div class="detail-section">
+              <h3>Order Details</h3>
+              <div class="detail-row"><label>Student</label><span id="trackStudent">—</span></div>
+              <div class="detail-row"><label>Hostel</label><span id="trackHostel">—</span></div>
+              <div class="detail-row"><label>Room</label><span id="trackRoom">—</span></div>
+              <div class="detail-row"><label>Print Type</label><span id="trackType">—</span></div>
+              <div class="detail-row"><label>Copies</label><span id="trackCopies">—</span></div>
+              <div class="detail-row"><label>Files</label><span id="trackFiles">—</span></div>
+              <div class="detail-row"><label>Status</label><span id="trackStatus">—</span></div>
+              <div class="detail-row"><label>Submitted</label><span id="trackDate">—</span></div>
+            </div>
+            <div class="detail-section"><h3>Status Timeline</h3><div class="timeline" id="trackTimeline"></div></div>
+          </div>
+        </div>
+      </div>
+      <!-- PROFILE -->
+      <div id="sd-profile" class="hidden">
+        <div class="dashboard-header"><div class="dashboard-title"><h1>Profile Settings</h1><p>Manage your account details</p></div></div>
+        <div style="max-width:480px">
+          <div class="detail-section">
+            <h3>👤 Your Information</h3>
+            <form onsubmit="SD.saveProfile(event)">
+              <div class="form-group"><label class="form-label">Username</label><input type="text" class="form-input" id="profileUsername" /></div>
+              <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="profileEmail" disabled style="opacity:0.6" /></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="form-group">
+                  <label class="form-label">Hostel</label>
+                  <select class="form-select" id="profileHostel">
+                    <option value="">Select hostel</option>
+                    <option>Krishna</option><option>Noyal</option><option>Vaigai</option>
+                    <option>Siruvani</option><option>Kaveri</option><option>Porunai</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Room Number</label><input type="text" class="form-input" id="profileRoom" /></div>
+              </div>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- SHOPKEEPER DASHBOARD -->
+<div id="page-shop-dashboard" class="page">
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="shopSidebar">
+      <ul class="sidebar-nav">
+        <li class="sidebar-section-title">Print Shop</li>
+        <li class="sidebar-item"><a onclick="SK.show('overview')" id="skn-overview" class="active"><span class="sidebar-icon">📊</span>Dashboard</a></li>
+        <li class="sidebar-item"><a onclick="SK.show('orders')" id="skn-orders"><span class="sidebar-icon">📋</span>All Orders</a></li>
+        <li class="sidebar-item"><a onclick="SK.show('batch')" id="skn-batch"><span class="sidebar-icon">📦</span>Batch Print</a></li>
+        <li class="sidebar-section-title">Account</li>
+        <li class="sidebar-item"><a onclick="SK.show('settings')" id="skn-settings"><span class="sidebar-icon">⚙️</span>Settings</a></li>
+        <li class="sidebar-item"><a onclick="App.logout()"><span class="sidebar-icon">🚪</span>Logout</a></li>
+      </ul>
+    </aside>
+    <main class="dashboard-main">
+      <!-- SK OVERVIEW -->
+      <div id="sk-overview">
+        <div class="dashboard-header">
+          <div class="dashboard-title">
+            <h1><span id="skWelcomeName" style="color:var(--primary)">—</span>'s Dashboard 🖨️</h1>
+            <p id="skDate">—</p>
+          </div>
+          <button class="btn btn-primary" onclick="SK.show('batch')">📦 Batch View</button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card warning"><div class="stat-icon">⏳</div><div class="stat-value" id="skStatPending">0</div><div class="stat-label">Pending</div></div>
+          <div class="stat-card primary"><div class="stat-icon">🖨️</div><div class="stat-value" id="skStatPrinting">0</div><div class="stat-label">Printing</div></div>
+          <div class="stat-card success"><div class="stat-icon">✅</div><div class="stat-value" id="skStatDelivered">0</div><div class="stat-label">Delivered</div></div>
+          <div class="stat-card info"><div class="stat-icon">📄</div><div class="stat-value" id="skStatTotal">0</div><div class="stat-label">Total Orders</div></div>
+        </div>
+        <div class="table-container">
+          <div class="table-header">
+            <h3>📥 Incoming Orders</h3>
+            <div class="table-filters">
+              <input type="text" class="table-search" id="skSearch" placeholder="Search username, token..." oninput="SK.filterOverview()" />
+              <select class="filter-select" id="skHostelFilter" onchange="SK.filterOverview()">
+                <option value="">All Hostels</option>
+                <option>Krishna</option><option>Noyal</option><option>Vaigai</option>
+                <option>Siruvani</option><option>Kaveri</option><option>Porunai</option>
+              </select>
+              <select class="filter-select" id="skStatusFilter" onchange="SK.filterOverview()">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option><option value="accepted">Accepted</option>
+                <option value="printing">Printing</option><option value="printed">Printed</option>
+                <option value="ready">Ready</option><option value="delivered">Delivered</option>
+              </select>
+            </div>
+          </div>
+          <div id="skBatchBar" class="batch-actions hidden">
+            <span id="skSelCount">0 selected</span>
+            <button class="btn btn-sm" style="background:var(--info);color:#fff" onclick="SK.bulkStatus('accepted')">✓ Accept</button>
+            <button class="btn btn-sm" style="background:var(--primary);color:#fff" onclick="SK.bulkStatus('printing')">🖨️ Printing</button>
+            <button class="btn btn-sm" style="background:var(--accent);color:#fff" onclick="SK.bulkStatus('printed')">✓ Printed</button>
+            <button class="btn btn-sm btn-success" onclick="SK.bulkStatus('delivered')">📦 Delivered</button>
+            <button class="btn btn-sm" style="background:#8B5CF6;color:#fff" onclick="SK.bulkDownload()">⬇ Bulk Download</button>
+            <button class="btn btn-sm" style="background:#EC4899;color:#fff" onclick="SK.bulkShare()">🔗 Share Selected</button>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead><tr>
+                <th><input type="checkbox" class="table-checkbox" id="skSelAll" onchange="SK.toggleAll(this,'skOrderBody')" /></th>
+                <th>Token</th><th>Username</th><th>Hostel</th><th>Room</th>
+                <th>Files</th><th>Type</th><th>Copies</th><th>Status</th><th>Submitted</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="skOrderBody"><tr><td colspan="11" class="empty-td">No orders yet. Orders from students will appear here.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- SK ALL ORDERS -->
+      <div id="sk-orders" class="hidden">
+        <div class="dashboard-header"><div class="dashboard-title"><h1>All Orders</h1><p>Complete order history and management</p></div></div>
+        <div class="table-container">
+          <div class="table-header">
+            <h3>Order List</h3>
+            <div class="table-filters">
+              <input type="text" class="table-search" id="skAllSearch" placeholder="Search..." oninput="SK.filterAll()" />
+              <select class="filter-select" id="skAllStatus" onchange="SK.filterAll()">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option><option value="accepted">Accepted</option>
+                <option value="printing">Printing</option><option value="printed">Printed</option>
+                <option value="ready">Ready</option><option value="delivered">Delivered</option>
+              </select>
+              <select class="filter-select" id="skAllHostel" onchange="SK.filterAll()">
+                <option value="">All Hostels</option>
+                <option>Krishna</option><option>Noyal</option><option>Vaigai</option>
+                <option>Siruvani</option><option>Kaveri</option><option>Porunai</option>
+              </select>
+            </div>
+          </div>
+          <div id="skAllBatchBar" class="batch-actions hidden">
+            <span id="skAllSelCount">0 selected</span>
+            <button class="btn btn-sm" style="background:var(--info);color:#fff" onclick="SK.bulkStatusAll('accepted')">✓ Accept</button>
+            <button class="btn btn-sm" style="background:var(--primary);color:#fff" onclick="SK.bulkStatusAll('printing')">🖨️ Printing</button>
+            <button class="btn btn-sm" style="background:var(--accent);color:#fff" onclick="SK.bulkStatusAll('printed')">✓ Printed</button>
+            <button class="btn btn-sm btn-success" onclick="SK.bulkStatusAll('delivered')">📦 Delivered</button>
+            <button class="btn btn-sm" style="background:#8B5CF6;color:#fff" onclick="SK.bulkDownloadAll()">⬇ Bulk Download</button>
+            <button class="btn btn-sm" style="background:#EC4899;color:#fff" onclick="SK.bulkShareAll()">🔗 Share Selected</button>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead><tr>
+                <th><input type="checkbox" class="table-checkbox" id="skAllSelAll" onchange="SK.toggleAll(this,'skAllOrderBody')" /></th>
+                <th>Token</th><th>Username</th><th>Hostel</th><th>Room</th>
+                <th>Files</th><th>Type</th><th>Copies</th><th>Sides</th><th>Status</th><th>Date</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="skAllOrderBody"><tr><td colspan="12" class="empty-td">No orders found.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- SK BATCH -->
+      <div id="sk-batch" class="hidden">
+        <div class="dashboard-header"><div class="dashboard-title"><h1>Batch Printing Dashboard</h1><p>Process orders in organized batches efficiently</p></div></div>
+        <div class="stats-grid">
+          <div class="stat-card warning" style="cursor:pointer" onclick="SK.setBatchFilter('pending')"><div class="stat-icon">⏳</div><div class="stat-value" id="batchStatP">0</div><div class="stat-label">Pending</div></div>
+          <div class="stat-card primary" style="cursor:pointer" onclick="SK.setBatchFilter('printing')"><div class="stat-icon">🖨️</div><div class="stat-value" id="batchStatPr">0</div><div class="stat-label">Printing</div></div>
+          <div class="stat-card info" style="cursor:pointer" onclick="SK.setBatchFilter('ready')"><div class="stat-icon">📋</div><div class="stat-value" id="batchStatR">0</div><div class="stat-label">Ready</div></div>
+          <div class="stat-card success" style="cursor:pointer" onclick="SK.setBatchFilter('delivered')"><div class="stat-icon">✅</div><div class="stat-value" id="batchStatD">0</div><div class="stat-label">Delivered</div></div>
+        </div>
+        <div class="table-container">
+          <div class="table-header">
+            <h3>📦 Batch Processing</h3>
+            <select class="filter-select" id="batchStatusSelect" onchange="SK.loadBatch(this.value)">
+              <option value="pending">⏳ Pending Orders</option>
+              <option value="printing">🖨️ Printing</option>
+              <option value="ready">📋 Ready</option>
+              <option value="delivered">✅ Delivered</option>
+            </select>
+          </div>
+          <div class="batch-actions">
+            <span>Select orders to process:</span>
+            <button class="btn btn-sm" style="background:var(--info);color:#fff" onclick="SK.batchAction('accepted')">✓ Accept</button>
+            <button class="btn btn-sm" style="background:var(--primary);color:#fff" onclick="SK.batchAction('printing')">🖨️ Mark Printing</button>
+            <button class="btn btn-sm" style="background:var(--accent);color:#fff" onclick="SK.batchAction('printed')">✓ Mark Printed</button>
+            <button class="btn btn-sm btn-success" onclick="SK.batchAction('delivered')">📦 Mark Delivered</button>
+            <button class="btn btn-sm" style="background:#8B5CF6;color:#fff" onclick="SK.batchDownload()">⬇ Download Selected</button>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead><tr>
+                <th><input type="checkbox" class="table-checkbox" id="batchSelAll" onchange="SK.toggleAll(this,'batchOrderBody')" /></th>
+                <th>Token</th><th>Username</th><th>Hostel</th><th>Room</th><th>Files</th><th>Copies</th><th>Type</th><th>Status</th>
+              </tr></thead>
+              <tbody id="batchOrderBody"><tr><td colspan="9" class="empty-td">No orders in this category.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- SK SETTINGS -->
+      <div id="sk-settings" class="hidden">
+        <div class="dashboard-header"><div class="dashboard-title"><h1>Shop Settings</h1><p>Your shop details</p></div></div>
+        <div style="max-width:480px">
+          <div class="detail-section">
+            <h3>🏪 Shop Information</h3>
+            <form onsubmit="SK.saveSettings(event)">
+              <div class="form-group"><label class="form-label">Username</label><input type="text" class="form-input" id="skProfileUsername" /></div>
+              <div class="form-group"><label class="form-label">Shop Name</label><input type="text" class="form-input" id="skProfileShopName" placeholder="e.g. Campus Print Hub" /></div>
+              <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="skProfileEmail" disabled style="opacity:0.6" /></div>
+              <button type="submit" class="btn btn-primary">Save Settings</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="page-admin-dashboard" class="page">
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="adminSidebar">
+      <ul class="sidebar-nav">
+        <li class="sidebar-section-title">Admin Panel</li>
+        <li class="sidebar-item"><a onclick="AD.show('overview')" id="adn-overview" class="active"><span class="sidebar-icon">📊</span>Dashboard</a></li>
+        <li class="sidebar-item"><a onclick="AD.show('users')" id="adn-users"><span class="sidebar-icon">👥</span>Students</a></li>
+        <li class="sidebar-item"><a onclick="AD.show('shops')" id="adn-shops"><span class="sidebar-icon">🏪</span>Shops</a></li>
+        <li class="sidebar-item"><a onclick="AD.show('orders')" id="adn-orders"><span class="sidebar-icon">📋</span>All Orders</a></li>
+        <li class="sidebar-section-title">System</li>
+        <li class="sidebar-item"><a onclick="App.logout()"><span class="sidebar-icon">🚪</span>Logout</a></li>
+      </ul>
+    </aside>
+    <main class="dashboard-main">
+      <div id="ad-overview">
+        <div class="dashboard-header"><div class="dashboard-title"><h1>Admin Dashboard</h1><p>Platform overview and management</p></div></div>
+        <div class="stats-grid">
+          <div class="stat-card primary"><div class="stat-icon">👥</div><div class="stat-value" id="adStatStudents">0</div><div class="stat-label">Total Students</div></div>
+          <div class="stat-card success"><div class="stat-icon">🏪</div><div class="stat-value" id="adStatShops">0</div><div class="stat-label">Partner Shops</div></div>
+          <div class="stat-card warning"><div class="stat-icon">📄</div><div class="stat-value" id="adStatOrders">0</div><div class="stat-label">Total Orders</div></div>
+          <div class="stat-card info"><div class="stat-icon">⚡</div><div class="stat-value" id="adStatActive">0</div><div class="stat-label">Active Orders</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+          <div class="detail-section"><h3>🏠 Orders by Hostel</h3><div id="adHostelChart"><div class="empty-td">No data yet.</div></div></div>
+          <div class="detail-section"><h3>🕒 Recent Activity</h3><div id="adRecentActivity"><div class="empty-td">No activity yet.</div></div></div>
+        </div>
+      </div>
+      <div id="ad-users" class="hidden">
+        <div class="dashboard-header"><div class="dashboard-title"><h1>Student Management</h1><p>All registered students</p></div></div>
+        <div class="table-container">
+          <div class="table-header"><h3>Registered Students</h3><input type="text" class="table-search" id="adUserSearch" placeholder="Search students..." oninput="AD.filterUsers(this.value)" /></div>
+          <div class="table-responsive"><table>
+            <thead><tr><th>Username</th><th>Email</th><th>Hostel</th><th>Room</th><th>Orders</th><th>Joined</th></tr></thead>
+            <tbody id="adUsersBody"><tr><td colspan="6" class="empty-td">No students registered yet.</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+      <div id="ad-shops" class="hidden">
+        <div class="dashboard-header"><div class="dashboard-title"><h1>Shop Management</h1><p>Partner print shops</p></div></div>
+        <div class="table-container">
+          <div class="table-header"><h3>Registered Shops</h3></div>
+          <div class="table-responsive"><table>
+            <thead><tr><th>Username</th><th>Shop Name</th><th>Email</th><th>Total Orders</th><th>Joined</th></tr></thead>
+            <tbody id="adShopsBody"><tr><td colspan="5" class="empty-td">No shops registered yet.</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+      <div id="ad-orders" class="hidden">
+        <div class="dashboard-header"><div class="dashboard-title"><h1>All Platform Orders</h1><p>Monitor every order across the platform</p></div></div>
+        <div class="table-container">
+          <div class="table-header">
+            <h3>Orders</h3>
+            <div class="table-filters">
+              <input type="text" class="table-search" id="adOrderSearch" placeholder="Search..." oninput="AD.filterOrders()" />
+              <select class="filter-select" id="adOrderStatus" onchange="AD.filterOrders()">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option><option value="accepted">Accepted</option>
+                <option value="printing">Printing</option><option value="printed">Printed</option>
+                <option value="ready">Ready</option><option value="delivered">Delivered</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-responsive"><table>
+            <thead><tr><th>Token</th><th>Username</th><th>Hostel</th><th>Room</th><th>Files</th><th>Type</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody id="adOrdersBody"><tr><td colspan="8" class="empty-td">No orders yet.</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="page-about" class="page">
+  <div class="page-hero"><div class="container"><h1>About PrintEase</h1><p>We're solving the printing chaos that hostel students face every exam season</p></div></div>
+  <section class="section"><div class="container">
+    <div class="about-grid">
+      <div class="about-text">
+        <h2>Born from a Real Problem</h2>
+        <p>Every exam season, hostel students receive their hall tickets late at night. With curfew restrictions, they can't visit print shops. Come exam morning, hundreds of students rush simultaneously, creating long queues and chaos.</p>
+        <p>Some students miss their exams. Others waste precious preparation time standing in lines. Shopkeepers, overwhelmed by hundreds of WhatsApp messages, struggle to manage the flood of orders.</p>
+        <p>PrintEase was built to solve this permanently. We're a document-order aggregation platform that organizes the chaos between students and print shops.</p>
+        <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="App.go('register')">Get Started Free</button>
+          <button class="btn btn-secondary" onclick="App.go('contact')">Contact Us</button>
+        </div>
+      </div>
+      <div>
+        <div class="detail-section" style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:16px"><div style="width:48px;height:48px;border-radius:var(--radius-md);background:var(--primary-bg);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">🎯</div><div><div style="font-size:1rem;font-weight:700;color:var(--gray-900)">Our Mission</div><div style="font-size:0.85rem;color:var(--gray-500);margin-top:4px">Eliminate printing-related exam stress for every hostel student in India</div></div></div></div>
+        <div class="detail-section" style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:16px"><div style="width:48px;height:48px;border-radius:var(--radius-md);background:var(--success-bg);color:var(--success);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">🌟</div><div><div style="font-size:1rem;font-weight:700;color:var(--gray-900)">Our Vision</div><div style="font-size:0.85rem;color:var(--gray-500);margin-top:4px">A campus ecosystem where academic document printing is seamless and stress-free</div></div></div></div>
+        <div class="detail-section"><div style="display:flex;align-items:center;gap:16px"><div style="width:48px;height:48px;border-radius:var(--radius-md);background:var(--warning-bg);color:var(--warning);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">💡</div><div><div style="font-size:1rem;font-weight:700;color:var(--gray-900)">The Problem We Solve</div><div style="font-size:0.85rem;color:var(--gray-500);margin-top:4px">Replace 100 WhatsApp messages with one organized, searchable, trackable dashboard</div></div></div></div>
+      </div>
+    </div>
+  </div></section>
+  <footer class="footer"><div class="container"><div class="footer-bottom"><p>© 2025 PrintEase. All rights reserved.</p><p>Made with ❤️ for hostel students everywhere</p></div></div></footer>
+</div>
+
+<!-- CONTACT -->
+<div id="page-contact" class="page">
+  <div class="page-hero"><div class="container"><h1>Contact Us</h1><p>Have questions? We'd love to hear from you</p></div></div>
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h2>Get in Touch</h2>
+        <p>Whether you're a student or a print shop wanting to partner with us, we're here to help.</p>
+        <div class="contact-item"><div class="ci-icon">📧</div><div><h4>Email</h4><p>hello@printease.in</p></div></div>
+        <div class="contact-item"><div class="ci-icon">📱</div><div><h4>Phone</h4><p>+91 98765 43210</p></div></div>
+        <div class="contact-item"><div class="ci-icon">📍</div><div><h4>Address</h4><p>Innovation Hub, University Campus, India</p></div></div>
+      </div>
+      <div class="contact-form-card">
+        <h3>Send a Message</h3>
+        <form onsubmit="App.contactSubmit(event)">
+          <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" placeholder="Your name" required /></div>
+          <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="you@example.com" required /></div>
+          <div class="form-group"><label class="form-label">Subject</label><select class="form-select"><option>General Inquiry</option><option>Partnership</option><option>Technical Support</option><option>Feedback</option></select></div>
+          <div class="form-group"><label class="form-label">Message</label><textarea class="form-textarea" rows="4" placeholder="Your message..." required></textarea></div>
+          <button type="submit" class="btn btn-primary w-full">Send Message</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <footer class="footer" style="margin-top:40px"><div class="container"><div class="footer-bottom"><p>© 2025 PrintEase. All rights reserved.</p><p>Made with ❤️ for hostel students everywhere</p></div></div></footer>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-overlay hidden" id="orderModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Order — <span id="modToken">—</span></h3>
+      <button class="modal-close" onclick="App.closeModal('orderModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="token-display" style="margin-bottom:20px;padding:20px"><label>Token Number</label><div class="token-number" style="font-size:2rem" id="modTokenLarge">—</div></div>
+      <div class="detail-row"><label>Username</label><span id="modUsername">—</span></div>
+      <div class="detail-row"><label>Hostel</label><span id="modHostel">—</span></div>
+      <div class="detail-row"><label>Room</label><span id="modRoom">—</span></div>
+      <div class="detail-row"><label>Print Type</label><span id="modType">—</span></div>
+      <div class="detail-row"><label>Copies</label><span id="modCopies">—</span></div>
+      <div class="detail-row"><label>Sides</label><span id="modSides">—</span></div>
+      <div class="detail-row"><label>Notes</label><span id="modNotes">—</span></div>
+      <div class="detail-row"><label>Submitted</label><span id="modDate">—</span></div>
+      <div style="margin-top:16px">
+        <label class="form-label">📎 Files</label>
+        <div id="modFilesList"></div>
+      </div>
+      <div style="margin-top:16px" id="modStatusUpdateWrap">
+        <label class="form-label">Update Status</label>
+        <select class="form-select" id="modStatusSel">
+          <option value="pending">Pending</option><option value="accepted">Accepted</option>
+          <option value="printing">Printing</option><option value="printed">Printed</option>
+          <option value="ready">Ready for Collection</option><option value="delivered">Delivered</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="App.closeModal('orderModal')">Cancel</button>
+      <button class="btn btn-primary" id="modUpdateBtn" onclick="SK.updateFromModal()">Update Status</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER SUCCESS MODAL -->
+<div class="modal-overlay hidden" id="successModal">
+  <div class="modal" style="text-align:center">
+    <div class="modal-body" style="padding:40px">
+      <div style="font-size:4rem;margin-bottom:16px">🎉</div>
+      <h2 style="font-size:1.5rem;font-weight:800;color:var(--gray-900);margin-bottom:8px">Order Submitted!</h2>
+      <p style="color:var(--gray-500);margin-bottom:24px">Your print order has been placed successfully</p>
+      <div class="token-display" style="margin-bottom:24px"><label>Your Token Number</label><div class="token-number" id="successToken">—</div></div>
+      <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:24px">Show this token at the print shop to collect your prints.</p>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button class="btn btn-ghost" onclick="App.closeModal('successModal')">Close</button>
+        <button class="btn btn-primary" onclick="App.closeModal('successModal');SD.show('tracking')">Track Order →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DOWNLOAD / SHARE MODAL -->
+<div class="modal-overlay hidden" id="downloadShareModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="dsModalTitle">Files</h3>
+      <button class="modal-close" onclick="App.closeModal('downloadShareModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="dsFileCheckList"></div>
+      <div id="dsShareLinkArea" class="hidden">
+        <label class="form-label" style="margin-top:16px">🔗 Shareable Link</label>
+        <div class="share-link-box" id="dsShareLink"></div>
+        <p style="font-size:0.78rem;color:var(--gray-500);margin-top:8px">⚠️ This is a simulated share link. In production, files are served from the server.</p>
+      </div>
+    </div>
+    <div class="modal-footer" id="dsModalFooter"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// STORAGE KEYS
+// ============================================================
+const KEYS = {
+  users:   'pe_users',
+  orders:  'pe_orders',
+  session: 'pe_session'
+};
+
+// ============================================================
+// PERSISTENCE — localStorage only, zero hardcoded data
+// ============================================================
+const Store = {
+  getUsers()   { try { return JSON.parse(localStorage.getItem(KEYS.users))  || []; } catch { return []; } },
+  saveUsers(d) { localStorage.setItem(KEYS.users,  JSON.stringify(d)); },
+  getOrders()  { try { return JSON.parse(localStorage.getItem(KEYS.orders)) || []; } catch { return []; } },
+  saveOrders(d){ localStorage.setItem(KEYS.orders, JSON.stringify(d)); },
+  getSession() { try { return JSON.parse(localStorage.getItem(KEYS.session)) || null; } catch { return null; } },
+  saveSession(u){ localStorage.setItem(KEYS.session, JSON.stringify(u)); },
+  clearSession(){ localStorage.removeItem(KEYS.session); }
+};
+
+// ============================================================
+// RUNTIME STATE — only data from localStorage / user actions
+// ============================================================
+const State = {
+  currentUser: null,
+  loginRole: 'student',
+  registerRole: 'student',
+  selectedOverviewIds: new Set(),
+  selectedAllIds: new Set(),
+  selectedBatchIds: new Set(),
+  modOrderId: null,
+  dsMode: null,       // 'download' | 'share'
+  dsOrderIds: [],
+  selectedFiles: []   // File objects for current upload
+};
+
+// ============================================================
+// HELPERS
+// ============================================================
+function $(id){ return document.getElementById(id); }
+function esc(s){ if(s===null||s===undefined)return'—'; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(d){ if(!d)return'—'; try{ return new Date(d).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}); }catch{ return d; } }
+function cap(s){ return s?s.charAt(0).toUpperCase()+s.slice(1):''; }
+function initials(n){ return n?n.trim().substring(0,2).toUpperCase():'??'; }
+
+function genToken(){
+  const c='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let t='PE-';
+  for(let i=0;i<6;i++) t+=c[Math.floor(Math.random()*c.length)];
+  const orders=Store.getOrders();
+  if(orders.find(o=>o.token===t)) return genToken();
+  return t;
+}
+
+function statusBadge(s){
+  const m={pending:'Pending',accepted:'Accepted',printing:'Printing',printed:'Printed',ready:'Ready',delivered:'Delivered'};
+  return `<span class="badge badge-${s}">${m[s]||cap(s)}</span>`;
+}
+function progressBar(s){
+  return `<div class="progress-mini"><div class="pmb pmb-${s}"></div></div>`;
+}
+function nextStatus(c){
+  const f=['pending','accepted','printing','printed','ready','delivered'];
+  const i=f.indexOf(c);
+  return i<f.length-1?f[i+1]:null;
+}
+
+function toast(type,title,msg){
+  const icons={success:'✓',error:'✕',warning:'⚠',info:'ℹ'};
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.innerHTML=`<div class="toast-icon">${icons[type]||'ℹ'}</div><div class="toast-content"><div class="toast-title">${esc(title)}</div><div class="toast-msg">${esc(msg)}</div></div><button class="toast-close" onclick="this.parentElement.remove()">✕</button>`;
+  $('toast-container').appendChild(el);
+  setTimeout(()=>el.remove(),5000);
+}
+
+// ============================================================
+// APP CONTROLLER
+// ============================================================
+const App = {
+  go(page){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    const t=$('page-'+page);
+    if(!t)return;
+    t.classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+    ['landing','about','contact'].forEach(p=>{
+      const el=$('nl-'+p);
+      if(el)el.classList.toggle('active',p===page);
+    });
+    this.closeMobile();
+  },
+  gotoDashboard(){
+    this.closeDropdown();
+    if(!State.currentUser)return;
+    const r=State.currentUser.role;
+    if(r==='student'){ this.go('student-dashboard'); SD.init(); }
+    else if(r==='shopkeeper'){ this.go('shop-dashboard'); SK.init(); }
+    else if(r==='admin'){ this.go('admin-dashboard'); AD.init(); }
+  },
+  updateNav(){
+    const u=State.currentUser;
+    const wrap=$('userMenuWrap');
+    const lb=$('navLoginBtn');
+    const rb=$('navRegisterBtn');
+    if(u){
+      wrap.classList.remove('hidden');
+      lb.style.display='none'; rb.style.display='none';
+      $('userAvatar').textContent=initials(u.username);
+      $('ddUsername').textContent=u.username;
+      $('ddRole').textContent=cap(u.role);
+    } else {
+      wrap.classList.add('hidden');
+      lb.style.display=''; rb.style.display='';
+    }
+  },
+  toggleDropdown(){ $('userDropdown').classList.toggle('open'); },
+  closeDropdown(){ $('userDropdown').classList.remove('open'); },
+  toggleMobile(){ $('mobileMenu').classList.toggle('open'); $('mobileToggle').classList.toggle('active'); },
+  closeMobile(){ $('mobileMenu').classList.remove('open'); $('mobileToggle').classList.remove('active'); },
+  logout(){
+    State.currentUser=null;
+    Store.clearSession();
+    this.updateNav(); this.closeDropdown();
+    toast('info','Logged Out','You have been successfully logged out');
+    this.go('landing');
+  },
+  openModal(id){ $(id).classList.remove('hidden'); },
+  closeModal(id){ $(id).classList.add('hidden'); },
+  contactSubmit(e){ e.preventDefault(); toast('success','Message Sent!',"We'll get back to you within 24 hours"); e.target.reset(); },
+  restoreSession(){
+    const s=Store.getSession();
+    if(s){
+      const users=Store.getUsers();
+      const u=users.find(x=>x.id===s.id);
+      if(u){ State.currentUser=u; this.updateNav(); }
+      else Store.clearSession();
+    }
+  }
+};
+
+// ============================================================
+// AUTH
+// ============================================================
+const Auth = {
+  init(){
+    document.querySelectorAll('#loginRoleTabs .auth-tab').forEach(tab=>{
+      tab.addEventListener('click',()=>{
+        document.querySelectorAll('#loginRoleTabs .auth-tab').forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+        State.loginRole=tab.dataset.role;
+      });
+    });
+    document.querySelectorAll('#registerRoleTabs .auth-tab').forEach(tab=>{
+      tab.addEventListener('click',()=>{
+        document.querySelectorAll('#registerRoleTabs .auth-tab').forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+        State.registerRole=tab.dataset.role;
+        $('studentRegFields').classList.toggle('hidden',tab.dataset.role!=='student');
+        $('shopRegFields').classList.toggle('hidden',tab.dataset.role!=='shopkeeper');
+      });
+    });
+  },
+  login(e){
+    e.preventDefault();
+    const email=$('loginEmail').value.trim().toLowerCase();
+    const pass=$('loginPassword').value;
+    const errEl=$('loginError');
+    errEl.textContent='';
+    const users=Store.getUsers();
+    const u=users.find(x=>x.email.toLowerCase()===email&&x.role===State.loginRole);
+    if(!u){ errEl.textContent='No account found with this email for the selected role.'; return; }
+    if(u.password!==pass){ errEl.textContent='Incorrect password. Please try again.'; return; }
+    State.currentUser=u;
+    Store.saveSession({id:u.id});
+    App.updateNav();
+    toast('success','Login Successful',`Welcome back, ${u.username}!`);
+    $('loginForm').reset();
+    App.gotoDashboard();
+  },
+  register(e){
+    e.preventDefault();
+    const errEl=$('registerError');
+    errEl.textContent='';
+    const username=$('regUsername').value.trim();
+    const email=$('regEmail').value.trim().toLowerCase();
+    const password=$('regPassword').value;
+    const role=State.registerRole;
+    if(!username||!email||!password){ errEl.textContent='All fields are required.'; return; }
+    if(username.length<3){ errEl.textContent='Username must be at least 3 characters.'; return; }
+    if(password.length<6){ errEl.textContent='Password must be at least 6 characters.'; return; }
+    const users=Store.getUsers();
+    if(users.find(u=>u.email.toLowerCase()===email)){ errEl.textContent='An account with this email already exists.'; return; }
+    if(users.find(u=>u.username.toLowerCase()===username.toLowerCase())){ errEl.textContent='This username is already taken.'; return; }
+    const newUser={
+      id:Date.now(), username, email, password, role,
+      hostel: role==='student'?($('regHostel').value||''):'',
+      room:   role==='student'?($('regRoom').value.trim()||''):'',
+      shopName: role==='shopkeeper'?($('regShopName').value.trim()||''):'',
+      createdAt: new Date().toISOString()
+    };
+    users.push(newUser);
+    Store.saveUsers(users);
+    State.currentUser=newUser;
+    Store.saveSession({id:newUser.id});
+    App.updateNav();
+    toast('success','Account Created!',`Welcome to PrintEase, ${username}!`);
+    $('registerForm').reset();
+    App.gotoDashboard();
+  }
+};
+
+// ============================================================
+// STUDENT DASHBOARD
+// ============================================================
+const SD = {
+  init(){
+    if(!State.currentUser)return;
+    this.show('overview');
+    this.initUpload();
+  },
+  show(section){
+    ['overview','upload','orders','tracking','profile'].forEach(s=>{
+      $('sd-'+s)?.classList.add('hidden');
+      $('sn-'+s)?.classList.remove('active');
+    });
+    $('sd-'+section)?.classList.remove('hidden');
+    $('sn-'+section)?.classList.add('active');
+    if(section==='overview') this.loadOverview();
+    if(section==='orders')   this.loadOrders('all');
+    if(section==='profile')  this.loadProfile();
+  },
+  loadOverview(){
+    if(!State.currentUser)return;
+    const u=State.currentUser;
+    $('sdWelcomeName').textContent=u.username;
+    const myOrders=Store.getOrders().filter(o=>o.userId===u.id);
+    $('sdStatTotal').textContent=myOrders.length;
+    $('sdStatCompleted').textContent=myOrders.filter(o=>o.status==='delivered').length;
+    $('sdStatActive').textContent=myOrders.filter(o=>o.status!=='delivered').length;
+    const latest=myOrders.length>0?[...myOrders].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt))[0].token:'—';
+    $('sdStatToken').textContent=latest;
+    const tbody=$('sdRecentBody');
+    const recent=[...myOrders].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,5);
+    if(recent.length===0){ tbody.innerHTML=`<tr><td colspan="7" class="empty-td">No orders yet. <a onclick="SD.show('upload')">Submit your first order →</a></td></tr>`; return; }
+    tbody.innerHTML=recent.map(o=>`
+      <tr>
+        <td><span style="font-weight:700;color:var(--primary);font-family:monospace">${esc(o.token)}</span></td>
+        <td>${esc(o.files.map(f=>f.name).join(', '))}</td>
+        <td>${esc(o.hostel)}</td>
+        <td>${o.printType==='color'?'Color':'B&W'}</td>
+        <td>${o.copies}</td>
+        <td>${statusBadge(o.status)}${progressBar(o.status)}</td>
+        <td>${fmtDate(o.createdAt)}</td>
+      </tr>`).join('');
+  },
+  loadOrders(filter){
+    if(!State.currentUser)return;
+    const u=State.currentUser;
+    $('sdOrdersUsername').textContent=u.username;
+    let orders=Store.getOrders().filter(o=>o.userId===u.id);
+    if(filter&&filter!=='all') orders=orders.filter(o=>o.status===filter);
+    orders.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+    const tbody=$('sdOrdersBody');
+    if(orders.length===0){ tbody.innerHTML=`<tr><td colspan="9" class="empty-td">No orders found.</td></tr>`; return; }
+    tbody.innerHTML=orders.map(o=>`
+      <tr>
+        <td><span style="font-weight:700;color:var(--primary);font-family:monospace">${esc(o.token)}</span></td>
+        <td title="${esc(o.files.map(f=>f.name).join('\n'))}">${o.files.length} file(s)</td>
+        <td>${esc(o.hostel)}</td>
+        <td>${esc(o.room)}</td>
+        <td>${o.printType==='color'?'Color':'B&W'}</td>
+        <td>${o.copies}</td>
+        <td>${statusBadge(o.status)}${progressBar(o.status)}</td>
+        <td>${fmtDate(o.createdAt)}</td>
+        <td><button class="btn btn-sm btn-ghost" onclick="SD.viewOrder('${esc(o.token)}')">View</button></td>
+      </tr>`).join('');
+  },
+  viewOrder(token){
+    const orders=Store.getOrders();
+    const o=orders.find(x=>x.token===token);
+    if(!o)return;
+    this.openOrderModal(o,false);
+  },
+  loadProfile(){
+    if(!State.currentUser)return;
+    const u=State.currentUser;
+    $('profileUsername').value=u.username;
+    $('profileEmail').value=u.email;
+    $('profileHostel').value=u.hostel||'';
+    $('profileRoom').value=u.room||'';
+  },
+  saveProfile(e){
+    e.preventDefault();
+    const users=Store.getUsers();
+    const idx=users.findIndex(x=>x.id===State.currentUser.id);
+    if(idx===-1)return;
+    const newUsername=$('profileUsername').value.trim();
+    if(!newUsername){ toast('error','Error','Username cannot be empty'); return; }
+    if(users.find(x=>x.id!==State.currentUser.id&&x.username.toLowerCase()===newUsername.toLowerCase())){ toast('error','Error','Username already taken'); return; }
+    users[idx].username=newUsername;
+    users[idx].hostel=$('profileHostel').value;
+    users[idx].room=$('profileRoom').value.trim();
+    Store.saveUsers(users);
+    State.currentUser=users[idx];
+    Store.saveSession({id:users[idx].id});
+    App.updateNav();
+    $('sdWelcomeName').textContent=users[idx].username;
+    $('sdOrdersUsername').textContent=users[idx].username;
+    toast('success','Profile Updated','Your profile has been saved');
+  },
+  initUpload(){
+    const zone=$('uploadZone');
+    const inp=$('fileInput');
+    if(!zone||!inp)return;
+    State.selectedFiles=[];
+    ['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.add('drag-over');}));
+    ['dragleave','drop'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.remove('drag-over');}));
+    zone.addEventListener('drop',e=>this.addFiles(e.dataTransfer.files));
+    inp.addEventListener('change',()=>{ this.addFiles(inp.files); inp.value=''; });
+  },
+  addFiles(files){
+    Array.from(files).forEach(f=>{
+      if(f.type!=='application/pdf'){ toast('warning','Invalid File',`${f.name} is not a PDF`); return; }
+      if(f.size>26214400){ toast('warning','File Too Large',`${f.name} exceeds 25MB`); return; }
+      if(!State.selectedFiles.find(sf=>sf.name===f.name&&sf.size===f.size)) State.selectedFiles.push(f);
+    });
+    this.renderFileList();
+  },
+  removeFile(i){ State.selectedFiles.splice(i,1); this.renderFileList(); },
+  renderFileList(){
+    const c=$('fileList');
+    if(!c)return;
+    c.innerHTML=State.selectedFiles.map((f,i)=>`
+      <div class="file-item">
+        <div class="file-icon-box">PDF</div>
+        <div class="file-info"><div class="file-name">${esc(f.name)}</div><div class="file-size">${(f.size/1048576).toFixed(2)} MB</div></div>
+        <button type="button" class="file-remove" onclick="SD.removeFile(${i})">✕</button>
+      </div>`).join('');
+  },
+  submitOrder(e){
+    e.preventDefault();
+    const errEl=$('uploadError');
+    errEl.textContent='';
+    if(State.selectedFiles.length===0){ errEl.textContent='Please upload at least one PDF file.'; return; }
+    const hostel=$('orderHostel').value;
+    const room=$('orderRoom').value.trim();
+    if(!hostel){ errEl.textContent='Please select your hostel.'; return; }
+    if(!room){ errEl.textContent='Please enter your room number.'; return; }
+    const order={
+      id:Date.now(), token:genToken(),
+      userId:State.currentUser.id,
+      username:State.currentUser.username,
+      hostel, room,
+      printType:document.querySelector('input[name="print_type"]:checked').value,
+      printSide:document.querySelector('input[name="print_side"]:checked').value,
+      copies:parseInt($('copiesInput').value)||1,
+      notes:$('orderNotes').value.trim(),
+      files:State.selectedFiles.map(f=>({name:f.name,size:f.size,type:f.type})),
+      status:'pending',
+      createdAt:new Date().toISOString()
+    };
+    const orders=Store.getOrders();
+    orders.push(order);
+    Store.saveOrders(orders);
+    State.selectedFiles=[];
+    this.renderFileList();
+    $('uploadForm').reset();
+    $('orderHostel').value='';
+    $('successToken').textContent=order.token;
+    App.openModal('successModal');
+    toast('success','Order Submitted!',`Token: ${order.token}`);
+  },
+  track(){
+    const input=$('trackInput').value.trim().toUpperCase();
+    const errEl=$('trackError');
+    const result=$('trackResult');
+    errEl.textContent=''; result.classList.add('hidden');
+    if(!input){ errEl.textContent='Please enter a token number.'; return; }
+    const orders=Store.getOrders();
+    const o=orders.find(x=>x.token===input);
+    if(!o){ errEl.textContent='Order not found. Please check your token.'; return; }
+    if(State.currentUser.role==='student'&&o.userId!==State.currentUser.id){ errEl.textContent='You can only track your own orders.'; return; }
+    $('trackToken').textContent=o.token;
+    $('trackStudent').textContent=o.username;
+    $('trackHostel').textContent=o.hostel;
+    $('trackRoom').textContent=o.room;
+    $('trackType').textContent=o.printType==='color'?'Color':'Black & White';
+    $('trackCopies').textContent=o.copies;
+    $('trackFiles').textContent=o.files.map(f=>f.name).join(', ')||'—';
+    $('trackStatus').innerHTML=statusBadge(o.status);
+    $('trackDate').textContent=fmtDate(o.createdAt);
+    this.renderTimeline(o.status);
+    result.classList.remove('hidden');
+  },
+  renderTimeline(currentStatus){
+    const steps=[
+      {key:'pending',label:'Order Submitted'},{key:'accepted',label:'Accepted by Shop'},
+      {key:'printing',label:'Printing in Progress'},{key:'printed',label:'Printed Successfully'},
+      {key:'ready',label:'Ready for Collection'},{key:'delivered',label:'Delivered'}
+    ];
+    const order=steps.map(s=>s.key);
+    const ci=order.indexOf(currentStatus);
+    $('trackTimeline').innerHTML=steps.map((step,i)=>{
+      const cls=i<ci?'done':i===ci?'current':'';
+      const sub=i<ci?'Completed':i===ci?'In progress...':'Waiting...';
+      return `<div class="timeline-item ${cls}"><div class="timeline-dot"></div><div class="timeline-content"><h4>${step.label}</h4><p>${sub}</p></div></div>`;
+    }).join('');
+  },
+  openOrderModal(o,showUpdate){
+    $('modToken').textContent=o.token;
+    $('modTokenLarge').textContent=o.token;
+    $('modUsername').textContent=o.username;
+    $('modHostel').textContent=o.hostel;
+    $('modRoom').textContent=o.room;
+    $('modType').textContent=o.printType==='color'?'Color':'B&W';
+    $('modCopies').textContent=o.copies;
+    $('modSides').textContent=o.printSide==='double'?'Double Side':'Single Side';
+    $('modNotes').textContent=o.notes||'—';
+    $('modDate').textContent=fmtDate(o.createdAt);
+    $('modStatusSel').value=o.status;
+    $('modStatusUpdateWrap').style.display=showUpdate?'':'none';
+    $('modUpdateBtn').style.display=showUpdate?'':'none';
+    State.modOrderId=o.id;
+    const fList=$('modFilesList');
+    if(o.files&&o.files.length>0){
+      fList.innerHTML=o.files.map(f=>`
+        <div class="file-select-row">
+          <div class="file-icon-box" style="width:32px;height:32px;font-size:0.65rem">PDF</div>
+          <span class="file-select-label">${esc(f.name)}</span>
+          <span class="file-select-size">${(f.size/1048576).toFixed(2)} MB</span>
+        </div>`).join('');
+    } else { fList.innerHTML='<p style="font-size:0.85rem;color:var(--gray-500)">No files attached.</p>'; }
+    App.openModal('orderModal');
+  }
+};
+
+// ============================================================
+// SHOPKEEPER DASHBOARD
+// ============================================================
+const SK = {
+  init(){
+    if(!State.currentUser)return;
+    this.show('overview');
+  },
+  show(section){
+    ['overview','orders','batch','settings'].forEach(s=>{
+      $('sk-'+s)?.classList.add('hidden');
+      $('skn-'+s)?.classList.remove('active');
+    });
+    $('sk-'+section)?.classList.remove('hidden');
+    $('skn-'+section)?.classList.add('active');
+    if(section==='overview'){ this.loadOverview(); }
+    if(section==='orders')  { this.filterAll(); }
+    if(section==='batch')   { this.updateBatchStats(); this.loadBatch('pending'); }
+    if(section==='settings'){ this.loadSettings(); }
+  },
+  loadOverview(){
+    if(!State.currentUser)return;
+    $('skWelcomeName').textContent=State.currentUser.username;
+    $('skDate').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    this.updateStats();
+    this.renderTable(Store.getOrders(),'skOrderBody',true);
+  },
+  updateStats(){
+    const all=Store.getOrders();
+    $('skStatPending').textContent=all.filter(o=>o.status==='pending').length;
+    $('skStatPrinting').textContent=all.filter(o=>o.status==='printing').length;
+    $('skStatDelivered').textContent=all.filter(o=>o.status==='delivered').length;
+    $('skStatTotal').textContent=all.length;
+  },
+  updateBatchStats(){
+    const all=Store.getOrders();
+    $('batchStatP').textContent=all.filter(o=>o.status==='pending').length;
+    $('batchStatPr').textContent=all.filter(o=>o.status==='printing').length;
+    $('batchStatR').textContent=all.filter(o=>o.status==='ready').length;
+    $('batchStatD').textContent=all.filter(o=>o.status==='delivered').length;
+    this.updateStats();
+  },
+  filterOverview(){
+    const search=($('skSearch')?.value||'').toLowerCase();
+    const hostel=$('skHostelFilter')?.value||'';
+    const status=$('skStatusFilter')?.value||'';
+    let orders=Store.getOrders();
+    if(search) orders=orders.filter(o=>o.username.toLowerCase().includes(search)||o.token.toLowerCase().includes(search));
+    if(hostel) orders=orders.filter(o=>o.hostel===hostel);
+    if(status) orders=orders.filter(o=>o.status===status);
+    this.renderTable(orders,'skOrderBody',true);
+  },
+  filterAll(){
+    const search=($('skAllSearch')?.value||'').toLowerCase();
+    const status=$('skAllStatus')?.value||'';
+    const hostel=$('skAllHostel')?.value||'';
+    let orders=Store.getOrders();
+    if(search) orders=orders.filter(o=>o.username.toLowerCase().includes(search)||o.token.toLowerCase().includes(search));
+    if(status) orders=orders.filter(o=>o.status===status);
+    if(hostel) orders=orders.filter(o=>o.hostel===hostel);
+    this.renderTableAll(orders);
+  },
+  renderTable(orders,tbodyId,overview){
+    const tbody=$(tbodyId);
+    if(!tbody)return;
+    const sorted=[...orders].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+    if(sorted.length===0){ tbody.innerHTML=`<tr><td colspan="11" class="empty-td">No orders found. Orders from students will appear here.</td></tr>`; return; }
+    tbody.innerHTML=sorted.map(o=>`
+      <tr>
+        <td><input type="checkbox" class="table-checkbox" data-id="${o.id}" onchange="SK.handleCheck('${tbodyId}','skBatchBar','skSelCount','selectedOverviewIds')" /></td>
+        <td><span style="font-weight:700;color:var(--primary);font-family:monospace">${esc(o.token)}</span></td>
+        <td style="font-weight:600;color:var(--primary)">${esc(o.username)}</td>
+        <td>${esc(o.hostel)}</td>
+        <td>${esc(o.room)}</td>
+        <td>${o.files.length} file(s)</td>
+        <td>${o.printType==='color'?'Color':'B&W'}</td>
+        <td>${o.copies}</td>
+        <td>${statusBadge(o.status)}${progressBar(o.status)}</td>
+        <td style="white-space:nowrap">${fmtDate(o.createdAt)}</td>
+        <td>
+          <button class="table-action-btn" onclick="SK.viewOrderModal(${o.id})" title="View">👁️</button>
+          <button class="table-action-btn" onclick="SK.quickNext(${o.id})" title="Next Status">⏭️</button>
+          <button class="table-action-btn" onclick="SK.openDownload([${o.id}])" title="Download">⬇️</button>
+          <button class="table-action-btn" onclick="SK.openShare([${o.id}])" title="Share">🔗</button>
+        </td>
+      </tr>`).join('');
+  },
+  renderTableAll(orders){
+    const tbody=$('skAllOrderBody');
+    if(!tbody)return;
+    const sorted=[...orders].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+    if(sorted.length===0){ tbody.innerHTML=`<tr><td colspan="12" class="empty-td">No orders found.</td></tr>`; return; }
+    tbody.innerHTML=sorted.map(o=>`
+      <tr>
+        <td><input type="checkbox" class="table-checkbox" data-id="${o.id}" onchange="SK.handleCheck('skAllOrderBody','skAllBatchBar','skAllSelCount','selectedAllIds')" /></td>
+        <td><span style="font-weight:700;color:var(--primary);font-family:monospace">${esc(o.token)}</span></td>
+        <td style="font-weight:600;color:var(--primary)">${esc(o.username)}</td>
+        <td>${esc(o.hostel)}</td>
+        <td>${esc(o.room)}</td>
+        <td>${o.files.length} file(s)</td>
+        <td>${o.printType==='color'?'Color':'B&W'}</td>
+        <td>${o.copies}</td>
+        <td>${o.printSide==='double'?'Double':'Single'}</td>
+        <td>${statusBadge(o.status)}${progressBar(o.status)}</td>
+        <td>${fmtDate(o.createdAt)}</td>
+        <td>
+          <button class="table-action-btn" onclick="SK.viewOrderModal(${o.id})" title="View">👁️</button>
+          <button class="table-action-btn" onclick="SK.quickNext(${o.id})" title="Next">⏭️</button>
+          <button class="table-action-btn" onclick="SK.openDownload([${o.id}])" title="Download">⬇️</button>
+          <button class="table-action-btn" onclick="SK.openShare([${o.id}])" title="Share">🔗</button>
+        </td>
+      </tr>`).join('');
+  },
+  loadBatch(status){
+    const orders=Store.getOrders().filter(o=>o.status===status).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+    const tbody=$('batchOrderBody');
+    if(!tbody)return;
+    if(orders.length===0){ tbody.innerHTML=`<tr><td colspan="9" class="empty-td">No orders with status: ${cap(status)}.</td></tr>`; return; }
+    tbody.innerHTML=orders.map(o=>`
+      <tr>
+        <td><input type="checkbox" class="table-checkbox" data-id="${o.id}" onchange="SK.handleCheckBatch()" /></td>
+        <td><span style="font-weight:700;color:var(--primary);font-family:monospace">${esc(o.token)}</span></td>
+        <td style="font-weight:600;color:var(--primary)">${esc(o.username)}</td>
+        <td>${esc(o.hostel)}</td>
+        <td>${esc(o.room)}</td>
+        <td>${o.files.length}</td>
+        <td>${o.copies}</td>
+        <td>${o.printType==='color'?'Color':'B&W'}</td>
+        <td>${statusBadge(o.status)}</td>
+      </tr>`).join('');
+  },
+  setBatchFilter(status){ $('batchStatusSelect').value=status; this.loadBatch(status); },
+  batchAction(status){
+    const checked=document.querySelectorAll('#batchOrderBody .table-checkbox:checked');
+    if(checked.length===0){ toast('warning','No Selection','Please select at least one order'); return; }
+    const ids=Array.from(checked).map(c=>parseInt(c.dataset.id));
+    this._applyStatus(ids,status);
+    this.updateBatchStats();
+    this.loadBatch($('batchStatusSelect').value);
+    this.filterOverview();
+  },
+  batchDownload(){
+    const checked=document.querySelectorAll('#batchOrderBody .table-checkbox:checked');
+    if(checked.length===0){ toast('warning','No Selection','Select orders to download'); return; }
+    const ids=Array.from(checked).map(c=>parseInt(c.dataset.id));
+    this.openDownload(ids);
+  },
+  handleCheck(tbodyId,barId,countId,stateKey){
+    const checked=document.querySelectorAll(`#${tbodyId} .table-checkbox:checked`);
+    State[stateKey]=new Set(Array.from(checked).map(c=>parseInt(c.dataset.id)));
+    const bar=$(barId);
+    if(bar){
+      bar.classList.toggle('hidden',checked.length===0);
+      $(countId).textContent=`${checked.length} selected`;
+    }
+  },
+  handleCheckBatch(){
+    const checked=document.querySelectorAll('#batchOrderBody .table-checkbox:checked');
+    State.selectedBatchIds=new Set(Array.from(checked).map(c=>parseInt(c.dataset.id)));
+  },
+  toggleAll(master,tbodyId){
+    document.querySelectorAll(`#${tbodyId} .table-checkbox`).forEach(cb=>cb.checked=master.checked);
+    if(tbodyId==='skOrderBody') this.handleCheck(tbodyId,'skBatchBar','skSelCount','selectedOverviewIds');
+    if(tbodyId==='skAllOrderBody') this.handleCheck(tbodyId,'skAllBatchBar','skAllSelCount','selectedAllIds');
+    if(tbodyId==='batchOrderBody') this.handleCheckBatch();
+  },
+  bulkStatus(status){
+    if(State.selectedOverviewIds.size===0){ toast('warning','No Selection','Select orders first'); return; }
+    this._applyStatus(Array.from(State.selectedOverviewIds),status);
+    State.selectedOverviewIds.clear();
+    $('skBatchBar').classList.add('hidden');
+    this.loadOverview();
+  },
+  bulkStatusAll(status){
+    if(State.selectedAllIds.size===0){ toast('warning','No Selection','Select orders first'); return; }
+    this._applyStatus(Array.from(State.selectedAllIds),status);
+    State.selectedAllIds.clear();
+    $('skAllBatchBar').classList.add('hidden');
+    this.filterAll(); this.updateStats();
+  },
+  bulkDownload(){
+    if(State.selectedOverviewIds.size===0){ toast('warning','No Selection','Select orders to download'); return; }
+    this.openDownload(Array.from(State.selectedOverviewIds));
+  },
+  bulkShare(){
+    if(State.selectedOverviewIds.size===0){ toast('warning','No Selection','Select orders to share'); return; }
+    this.openShare(Array.from(State.selectedOverviewIds));
+  },
+  bulkDownloadAll(){
+    if(State.selectedAllIds.size===0){ toast('warning','No Selection','Select orders to download'); return; }
+    this.openDownload(Array.from(State.selectedAllIds));
+  },
+  bulkShareAll(){
+    if(State.selectedAllIds.size===0){ toast('warning','No Selection','Select orders to share'); return; }
+    this.openShare(Array.from(State.selectedAllIds));
+  },
+  _applyStatus(ids,status){
+    const orders=Store.getOrders();
+    ids.forEach(id=>{ const o=orders.find(x=>x.id===id); if(o) o.status=status; });
+    Store.saveOrders(orders);
+    toast('success','Updated',`${ids.length} order${ids.length>1?'s':''} → ${cap(status)}`);
+  },
+  quickNext(orderId){
+    const orders=Store.getOrders();
+    const o=orders.find(x=>x.id===orderId);
+    if(!o)return;
+    const ns=nextStatus(o.status);
+    if(!ns){ toast('info','Already Delivered','This order is complete'); return; }
+    o.status=ns;
+    Store.saveOrders(orders);
+    toast('success','Status Updated',`${o.token} → ${cap(ns)}`);
+    this.loadOverview();
+    if($('sk-orders')&&!$('sk-orders').classList.contains('hidden')) this.filterAll();
+    if($('sk-batch')&&!$('sk-batch').classList.contains('hidden')){ this.updateBatchStats(); this.loadBatch($('batchStatusSelect').value); }
+  },
+  viewOrderModal(orderId){
+    const orders=Store.getOrders();
+    const o=orders.find(x=>x.id===orderId);
+    if(!o)return;
+    SD.openOrderModal(o,true);
+  },
+  updateFromModal(){
+    const orders=Store.getOrders();
+    const idx=orders.findIndex(x=>x.id===State.modOrderId);
+    if(idx===-1)return;
+    orders[idx].status=$('modStatusSel').value;
+    Store.saveOrders(orders);
+    toast('success','Status Updated',`${orders[idx].token} → ${cap(orders[idx].status)}`);
+    App.closeModal('orderModal');
+    this.loadOverview();
+    if($('sk-orders')&&!$('sk-orders').classList.contains('hidden')) this.filterAll();
+    if($('sk-batch')&&!$('sk-batch').classList.contains('hidden')){ this.updateBatchStats(); this.loadBatch($('batchStatusSelect').value); }
+  },
+  // ---- DOWNLOAD ----
+  openDownload(orderIds){
+    State.dsMode='download';
+    State.dsOrderIds=orderIds;
+    const orders=Store.getOrders();
+    const allFiles=[];
+    orderIds.forEach(id=>{
+      const o=orders.find(x=>x.id===id);
+      if(o) o.files.forEach((f,fi)=>allFiles.push({orderId:id,token:o.token,fileIndex:fi,name:f.name,size:f.size}));
+    });
+    $('dsModalTitle').textContent=`⬇ Download Files (${allFiles.length} total)`;
+    $('dsShareLinkArea').classList.add('hidden');
+    $('dsFileCheckList').innerHTML=allFiles.length===0
+      ?'<p style="color:var(--gray-500);font-size:0.9rem">No files found in selected orders.</p>'
+      :allFiles.map((f,i)=>`
+        <div class="file-select-row">
+          <input type="checkbox" class="table-checkbox" id="dsf_${i}" data-token="${esc(f.token)}" data-name="${esc(f.name)}" data-size="${f.size}" checked />
+          <label class="file-select-label" for="dsf_${i}"><strong style="color:var(--primary)">${esc(f.token)}</strong> — ${esc(f.name)}</label>
+          <span class="file-select-size">${(f.size/1048576).toFixed(2)} MB</span>
+        </div>`).join('');
+    $('dsModalFooter').innerHTML=`
+      <button class="btn btn-ghost" onclick="App.closeModal('downloadShareModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="SK.executeDownload()">⬇ Download Selected</button>`;
+    App.openModal('downloadShareModal');
+  },
+  executeDownload(){
+    const checked=document.querySelectorAll('#dsFileCheckList input[type="checkbox"]:checked');
+    if(checked.length===0){ toast('warning','No Files','Select at least one file'); return; }
+    // Since files are stored as metadata only (no actual binary in localStorage),
+    // we generate a manifest text file as a realistic simulation.
+    const lines=['PrintEase — File Download Manifest','Generated: '+new Date().toLocaleString('en-IN'),'','Selected Files:','─'.repeat(40)];
+    checked.forEach((cb,i)=>{ lines.push(`${i+1}. [${cb.dataset.token}] ${cb.dataset.name} (${(parseInt(cb.dataset.size)/1048576).toFixed(2)} MB)`); });
+    lines.push('','─'.repeat(40));
+    lines.push('Note: In production, actual PDF files are downloaded from the server.');
+    const blob=new Blob([lines.join('\n')],{type:'text/plain'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=`printease_files_${Date.now()}.txt`; a.click();
+    URL.revokeObjectURL(url);
+    toast('success','Download Started',`${checked.length} file(s) manifest downloaded`);
+    App.closeModal('downloadShareModal');
+  },
+  // ---- SHARE ----
+  openShare(orderIds){
+    State.dsMode='share';
+    State.dsOrderIds=orderIds;
+    const orders=Store.getOrders();
+    const allFiles=[];
+    orderIds.forEach(id=>{
+      const o=orders.find(x=>x.id===id);
+      if(o) o.files.forEach((f,fi)=>allFiles.push({orderId:id,token:o.token,fileIndex:fi,name:f.name,size:f.size}));
+    });
+    $('dsModalTitle').textContent=`🔗 Share Files`;
+    $('dsFileCheckList').innerHTML=allFiles.length===0
+      ?'<p style="color:var(--gray-500);font-size:0.9rem">No files found in selected orders.</p>'
+      :allFiles.map((f,i)=>`
+        <div class="file-select-row">
+          <input type="checkbox" class="table-checkbox" id="dsf_${i}" data-token="${esc(f.token)}" data-name="${esc(f.name)}" checked />
+          <label class="file-select-label" for="dsf_${i}"><strong style="color:var(--primary)">${esc(f.token)}</strong> — ${esc(f.name)}</label>
+          <span class="file-select-size">${(f.size/1048576).toFixed(2)} MB</span>
+        </div>`).join('');
+    $('dsShareLinkArea').classList.add('hidden');
+    $('dsModalFooter').innerHTML=`
+      <button class="btn btn-ghost" onclick="App.closeModal('downloadShareModal')">Cancel</button>
+      <button class="btn btn-primary" style="background:#EC4899;box-shadow:0 4px 14px rgba(236,72,153,0.4)" onclick="SK.generateShareLink()">🔗 Generate Share Link</button>`;
+    App.openModal('downloadShareModal');
+  },
+  generateShareLink(){
+    const checked=document.querySelectorAll('#dsFileCheckList input[type="checkbox"]:checked');
+    if(checked.length===0){ toast('warning','No Files','Select at least one file'); return; }
+    const fileNames=Array.from(checked).map(cb=>cb.dataset.name);
+    const shareId=Math.random().toString(36).substring(2,10).toUpperCase();
+    const fakeLink=`${window.location.origin}${window.location.pathname}?share=${shareId}&files=${encodeURIComponent(fileNames.join(','))}`;
+    $('dsShareLink').textContent=fakeLink;
+    $('dsShareLinkArea').classList.remove('hidden');
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(fakeLink).then(()=>toast('success','Link Copied!',`Share link for ${checked.length} file(s) copied to clipboard`));
+    } else {
+      toast('info','Share Link Generated','Copy the link from the box below');
+    }
+  },
+  loadSettings(){
+    if(!State.currentUser)return;
+    $('skProfileUsername').value=State.currentUser.username;
+    $('skProfileShopName').value=State.currentUser.shopName||'';
+    $('skProfileEmail').value=State.currentUser.email;
+  },
+  saveSettings(e){
+    e.preventDefault();
+    const users=Store.getUsers();
+    const idx=users.findIndex(x=>x.id===State.currentUser.id);
+    if(idx===-1)return;
+    const newUsername=$('skProfileUsername').value.trim();
+    if(!newUsername){ toast('error','Error','Username cannot be empty'); return; }
+    if(users.find(x=>x.id!==State.currentUser.id&&x.username.toLowerCase()===newUsername.toLowerCase())){ toast('error','Error','Username already taken'); return; }
+    users[idx].username=newUsername;
+    users[idx].shopName=$('skProfileShopName').value.trim();
+    Store.saveUsers(users);
+    State.currentUser=users[idx];
+    Store.saveSession({id:users[idx].id});
+    App.updateNav();
+    $('skWelcomeName').textContent=users[idx].username;
+    toast('success','Settings Saved','Your shop settings have been updated');
+  }
+};
+
+// ============================================================
+// ADMIN DASHBOARD
+// ============================================================
+const AD = {
+  init(){ if(!State.currentUser)return; this.show('overview'); },
+  show(section){
+    ['overview','users','shops','orders'].forEach(s=>{ $('ad-'+s)?.classList.add('hidden'); $('adn-'+s)?.classList.remove('active'); });
+    $('ad-'+section)?.classList.remove('hidden');
+    $('adn-'+section)?.classList.add('active');
+    if(section==='overview') this.loadOverview();
+    if(section==='users')    this.loadUsers();
+    if(section==='shops')    this.loadShops();
+    if(section==='orders')   this.filterOrders();
+  },
+  loadOverview(){
+    const users=Store.getUsers();
+    const orders=Store.getOrders();
+    $('adStatStudents').textContent=users.filter(u=>u.role==='student').length;
+    $('adStatShops').textContent=users.filter(u=>u.role==='shopkeeper').length;
+    $('adStatOrders').textContent=orders.length;
+    $('adStatActive').textContent=orders.filter(o=>o.status!=='delivered').length;
+    const hostelDiv=$('adHostelChart');
+    const hostels=['Krishna','Noyal','Vaigai','Siruvani','Kaveri','Porunai'];
+    const hc=hostels.map(h=>({h,c:orders.filter(o=>o.hostel===h).length})).filter(x=>x.c>0).sort((a,b)=>b.c-a.c);
+    if(hc.length===0){ hostelDiv.innerHTML='<div class="empty-td">No order data yet.</div>'; }
+    else{ const max=hc[0].c; hostelDiv.innerHTML=hc.map(x=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:4px"><span style="font-weight:600">${esc(x.h)}</span><span style="color:var(--gray-500)">${x.c} orders</span></div><div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden"><div style="height:100%;width:${Math.round((x.c/max)*100)}%;background:var(--primary);border-radius:4px"></div></div></div>`).join(''); }
+    const actDiv=$('adRecentActivity');
+    const recent=[...orders].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,8);
+    if(recent.length===0){ actDiv.innerHTML='<div class="empty-td">No activity yet.</div>'; }
+    else{ actDiv.innerHTML=recent.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100)"><div><div style="font-size:0.85rem;font-weight:600;color:var(--primary)">${esc(r.username)}</div><div style="font-size:0.75rem;color:var(--gray-400)">${esc(r.token)} · ${esc(r.hostel)}</div></div><div style="text-align:right">${statusBadge(r.status)}<div style="font-size:0.7rem;color:var(--gray-400);margin-top:3px">${fmtDate(r.createdAt)}</div></div></div>`).join(''); }
+  },
+  loadUsers(){
+    const students=Store.getUsers().filter(u=>u.role==='student');
+    const orders=Store.getOrders();
+    const tbody=$('adUsersBody');
+    if(students.length===0){ tbody.innerHTML='<tr><td colspan="6" class="empty-td">No students registered yet.</td></tr>'; return; }
+    tbody.innerHTML=students.map(u=>`<tr><td style="font-weight:600;color:var(--primary)">${esc(u.username)}</td><td>${esc(u.email)}</td><td>${esc(u.hostel||'—')}</td><td>${esc(u.room||'—')}</td><td>${orders.filter(o=>o.userId===u.id).length}</td><td>${fmtDate(u.createdAt)}</td></tr>`).join('');
+  },
+  filterUsers(q){
+    const students=Store.getUsers().filter(u=>u.role==='student').filter(u=>!q||(u.username.toLowerCase().includes(q.toLowerCase())||u.email.toLowerCase().includes(q.toLowerCase())));
+    const orders=Store.getOrders();
+    const tbody=$('adUsersBody');
+    if(students.length===0){ tbody.innerHTML='<tr><td colspan="6" class="empty-td">No students found.</td></tr>'; return; }
+    tbody.innerHTML=students.map(u=>`<tr><td style="font-weight:600;color:var(--primary)">${esc(u.username)}</td><td>${esc(u.email)}</td><td>${esc(u.hostel||'—')}</td><td>${esc(u.room||'—')}</td><td>${orders.filter(o=>o.userId===u.id).length}</td><td>${fmtDate(u.createdAt)}</td></tr>`).join('');
+  },
+  loadShops(){
+    const shops=Store.getUsers().filter(u=>u.role==='shopkeeper');
+    const tbody=$('adShopsBody');
+    if(shops.length===0){ tbody.innerHTML='<tr><td colspan="5" class="empty-td">No shops registered yet.</td></tr>'; return; }
+    tbody.innerHTML=shops.map(u=>`<tr><td style="font-weight:600;color:var(--primary)">${esc(u.username)}</td><td>${esc(u.shopName||'—')}</td><td>${esc(u.email)}</td><td>—</td><td>${fmtDate(u.createdAt)}</td></tr>`).join('');
+  },
+  filterOrders(){
+    const q=($('adOrderSearch')?.value||'').toLowerCase();
+    const status=$('adOrderStatus')?.value||'';
+    let orders=[...Store.getOrders()].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+    if(q) orders=orders.filter(o=>o.username.toLowerCase().includes(q)||o.token.toLowerCase().includes(q));
+    if(status) orders=orders.filter(o=>o.status===status);
+    const tbody=$('adOrdersBody');
+    if(orders.length===0){ tbody.innerHTML='<tr><td colspan="8" class="empty-td">No orders found.</td></tr>'; return; }
+    tbody.innerHTML=orders.map(o=>`<tr><td><span style="font-weight:700;color:var(--primary);font-family:monospace">${esc(o.token)}</span></td><td style="font-weight:600;color:var(--primary)">${esc(o.username)}</td><td>${esc(o.hostel)}</td><td>${esc(o.room)}</td><td>${o.files.length}</td><td>${o.printType==='color'?'Color':'B&W'}</td><td>${statusBadge(o.status)}</td><td>${fmtDate(o.createdAt)}</td></tr>`).join('');
+  }
+};
+
+// ============================================================
+// BOOTSTRAP
+// ============================================================
+document.addEventListener('DOMContentLoaded',()=>{
+  Auth.init();
+  App.restoreSession();
+
+  document.addEventListener('click',e=>{
+    const dd=$('userDropdown');
+    const av=$('userAvatar');
+    if(dd&&!dd.contains(e.target)&&av&&!av.contains(e.target)) dd.classList.remove('open');
+    document.querySelectorAll('.modal-overlay').forEach(m=>{ if(e.target===m) m.classList.add('hidden'); });
+  });
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape') document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.add('hidden'));
+  });
+
+  window.addEventListener('scroll',()=>{
+    $('mainNav').classList.toggle('scrolled',window.scrollY>20);
+  });
+});
+</script>
+</body>
+</html>
